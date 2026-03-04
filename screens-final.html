@@ -1,0 +1,3921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Diagnostic App — Brand Skins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700;1,800&family=Outfit:wght@300;400;500;600;700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Nunito:wght@400;500;600;700;800&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+  font-family: var(--font-body, system-ui);
+  background: #e5e5e5;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ══════════════════════════════════════════════════
+   SKIN BAR
+══════════════════════════════════════════════════ */
+.skin-bar {
+  width: 100%;
+  max-width: 390px;
+  background: #161616;
+  padding: 8px 10px;
+  display: flex; gap: 5px;
+  position: sticky; top: 0; z-index: 999;
+  border-bottom: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+.skin-btn {
+  flex: 1; border: none; cursor: pointer;
+  padding: 6px 2px 5px;
+  border-radius: 6px;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .3px; text-transform: uppercase;
+  line-height: 1.3;
+  opacity: .38;
+  transition: opacity .2s, transform .15s;
+  font-family: system-ui, sans-serif;
+}
+.skin-btn.active { opacity: 1; transform: translateY(-1px); }
+.skin-btn[data-skin="bd"]      { background: #003865; color: #7ecfff; }
+.skin-btn[data-skin="quidel"]  { background: #1E3A5F; color: #ff9d5c; }
+.skin-btn[data-skin="abbott"]  { background: #1B1F6A; color: #F5C512; }
+.skin-btn[data-skin="ihealth"] { background: #E84511; color: #ffffff; }
+.skin-btn[data-skin="default"] { background: #e5e7eb; color: #374151; }
+
+/* ══════════════════════════════════════════════════
+   NAV SLIDER
+══════════════════════════════════════════════════ */
+.nav-slider-bar {
+  width: 100%;
+  max-width: 390px;
+  background: #111;
+  padding: 6px 14px 8px;
+  position: sticky; top: 36px; z-index: 998;
+  border-bottom: 1px solid #222;
+  flex-shrink: 0;
+}
+/* Row 1: section labels ABOVE the track */
+.slider-sections-above {
+  position: relative;
+  height: 13px;
+  margin-bottom: 4px;
+}
+.slider-sections-above span {
+  position: absolute;
+  top: 0;
+  font-size: 7.5px; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+  color: #444;
+  font-family: system-ui, sans-serif;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  line-height: 1;
+}
+.slider-sections-above span:first-child { transform: none; }
+.slider-sections-above span:last-child  { transform: translateX(-100%); }
+
+/* Row 2: the track itself */
+#navSlider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 3px;
+  border-radius: 999px;
+  outline: none; cursor: pointer;
+  margin: 0;
+  background: linear-gradient(90deg,
+    #555 0%, #555 var(--fill, 0%),
+    #2a2a2a var(--fill, 0%), #2a2a2a 100%);
+}
+#navSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.6);
+  cursor: grab;
+}
+#navSlider:active::-webkit-slider-thumb { cursor: grabbing; transform: scale(1.1); }
+#navSlider::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #fff; border: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.6);
+}
+
+/* Row 3: current screen name BELOW the track */
+.slider-screen-below {
+  margin-top: 5px;
+  text-align: center;
+  font-size: 9.5px; font-weight: 600;
+  color: #888;
+  font-family: system-ui, sans-serif;
+  letter-spacing: .1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════════════
+   PAGE WRAP + SHELL
+══════════════════════════════════════════════════ */
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 390px;
+  min-height: 100svh;
+}
+
+/* ══════════════════════════════════════════════════
+   SHELL + SCREENS
+══════════════════════════════════════════════════ */
+.shell {
+  flex: 1;
+  width: 100%;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: var(--color-bg);
+  transition: background .3s;
+}
+
+.screens { flex: 1; position: relative; overflow: hidden; }
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 44px 28px 24px;
+  overflow-y: auto;
+  opacity: 0; transform: translateX(28px);
+  pointer-events: none;
+  transition: opacity .28s ease, transform .28s ease;
+  background: var(--color-bg);
+}
+.screen.active  { opacity: 1; transform: none; pointer-events: auto; }
+.screen.exit    { opacity: 0; transform: translateX(-28px); }
+
+/* ══════════════════════════════════════════════════
+   SHARED BASE TOKENS  (overridden per skin)
+══════════════════════════════════════════════════ */
+:root {
+  --color-primary:    #2563eb;
+  --color-primary-lt: #eff6ff;
+  --color-accent:     #f59e0b;
+  --color-bg:         #f8fafc;
+  --color-surface:    #ffffff;
+  --color-text:       #1e293b;
+  --color-muted:      #64748b;
+  --color-border:     #e2e8f0;
+  --color-error:      #dc2626;
+  --color-success:    #16a34a;
+  --font-display:     system-ui, sans-serif;
+  --font-body:        system-ui, sans-serif;
+  --radius-xs:        4px;
+  --radius-sm:        8px;
+  --radius-md:        12px;
+  --radius-lg:        18px;
+  --radius-xl:        26px;
+  --btn-shadow:       0 2px 8px rgba(0,0,0,.12);
+}
+
+/* ══════════════════════════════════════════════════
+   ① BD — BECTON DICKINSON
+   Navy #003865 · BD Green #009A44
+   Barlow + Barlow Condensed · razor-sharp edges
+   Institutional, precise, zero frivolity
+══════════════════════════════════════════════════ */
+[data-skin="bd"] {
+  --color-primary:    #003865;
+  --color-primary-lt: #e6edf5;
+  --color-accent:     #009A44;
+  --color-bg:         #f0f3f7;
+  --color-surface:    #ffffff;
+  --color-text:       #001f3d;
+  --color-muted:      #5a7494;
+  --color-border:     #c4d0de;
+  --color-error:      #c0392b;
+  --color-success:    #009A44;
+  --font-display:     'Barlow Condensed', 'Barlow', sans-serif;
+  --font-body:        'Barlow', sans-serif;
+  --radius-xs:        0px;
+  --radius-sm:        2px;
+  --radius-md:        2px;
+  --radius-lg:        3px;
+  --radius-xl:        4px;
+  --btn-shadow:       none;
+}
+[data-skin="bd"] .shell {
+  border-top: 4px solid var(--color-primary);
+}
+[data-skin="bd"] .screen-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 30px; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+  color: var(--color-primary);
+}
+[data-skin="bd"] .screen-sub { font-size: 14px; font-weight: 400; }
+[data-skin="bd"] .btn-primary {
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  box-shadow: none;
+}
+[data-skin="bd"] .btn-outline {
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+}
+[data-skin="bd"] .input {
+  border-radius: 0;
+  border: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-primary);
+  background: #fff;
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+}
+[data-skin="bd"] .input:focus {
+  border-bottom-color: var(--color-accent);
+  box-shadow: none; outline: none;
+  border-color: var(--color-border);
+  border-bottom: 2px solid var(--color-accent);
+}
+[data-skin="bd"] .field label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+  color: var(--color-primary); text-transform: uppercase;
+}
+[data-skin="bd"] .brand-icon {
+  background: var(--color-primary);
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-skin="bd"] .brand-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--color-primary);
+}
+[data-skin="bd"] .brand-tagline {
+  font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--color-muted);
+}
+[data-skin="bd"] .hero-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 40px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--color-primary);
+}
+[data-skin="bd"] .hero-title em { font-style: normal; color: var(--color-accent); }
+[data-skin="bd"] .hero-badge {
+  background: var(--color-primary); color: #fff;
+  border-radius: 0; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; letter-spacing: 1.5px; font-weight: 600;
+}
+[data-skin="bd"] .chip {
+  border-radius: 0; border: 1px solid var(--color-border);
+  font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 500;
+  background: #fff;
+}
+[data-skin="bd"] .welcome-hero {
+  background: linear-gradient(170deg, #e6edf5 0%, #f0f3f7 60%);
+  margin: -44px -28px 24px; padding: 56px 28px 32px;
+  border-bottom: 3px solid var(--color-primary);
+}
+[data-skin="bd"] .otp-box {
+  border-radius: 0; border: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-primary);
+  font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 600;
+}
+[data-skin="bd"] .otp-box:focus { border-bottom-color: var(--color-accent); box-shadow: none; }
+[data-skin="bd"] .otp-box.filled { background: #e6edf5; border-bottom-color: var(--color-accent); }
+[data-skin="bd"] .pw-reqs { background: #e6edf5; border-radius: 0; border-left: 3px solid var(--color-primary); }
+[data-skin="bd"] .req { font-family: 'Barlow', sans-serif; font-size: 12px; }
+[data-skin="bd"] .back-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--color-primary); }
+[data-skin="bd"] .auth-footer { font-family: 'Barlow', sans-serif; font-size: 13px; }
+[data-skin="bd"] .auth-footer button { color: var(--color-accent); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: .5px; }
+[data-skin="bd"] .link-right button { color: var(--color-accent); font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 600; }
+[data-skin="bd"] .progress-dots .dot.active { background: var(--color-accent); width: 22px; }
+[data-skin="bd"] .select-wrapper select { border-radius: 0; border-bottom: 2px solid var(--color-primary); font-family: 'Barlow', sans-serif; }
+[data-skin="bd"] .consent { font-family: 'Barlow', sans-serif; font-size: 12px; }
+[data-skin="bd"] .toggle-label { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+[data-skin="bd"] .check-row label { font-family: 'Barlow', sans-serif; font-size: 12px; }
+[data-skin="bd"] .modal-card { border-radius: 0; border-top: 4px solid var(--color-primary); }
+[data-skin="bd"] .modal-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+[data-skin="bd"] .screen-bd-rule { display: block; }
+/* BD accent bar below nav */
+[data-skin="bd"] .bd-accent-bar {
+  display: flex; height: 3px;
+  background: linear-gradient(90deg, var(--color-primary) 60%, var(--color-accent) 100%);
+  margin: -44px -28px 32px; width: calc(100% + 56px);
+}
+[data-skin="bd"] #screen-done .brand-icon { border-radius: 0; box-shadow: none; }
+
+/* ══════════════════════════════════════════════════
+   ② QUIDEL ORTHO
+   Orange #E85D04 · Navy #1B3A6B
+   Outfit · clean, modern diagnostic energy
+══════════════════════════════════════════════════ */
+[data-skin="quidel"] {
+  --color-primary:    #1B3A6B;
+  --color-primary-lt: #EEF2F9;
+  --color-accent:     #E85D04;
+  --color-bg:         #ffffff;
+  --color-surface:    #ffffff;
+  --color-text:       #0d1e3a;
+  --color-muted:      #6b7fa8;
+  --color-border:     #dce3ef;
+  --color-error:      #dc2626;
+  --color-success:    #15803d;
+  --font-display:     'Outfit', sans-serif;
+  --font-body:        'Outfit', sans-serif;
+  --radius-xs:        6px;
+  --radius-sm:        10px;
+  --radius-md:        14px;
+  --radius-lg:        20px;
+  --radius-xl:        28px;
+  --btn-shadow:       0 3px 14px rgba(27,58,107,.22);
+}
+[data-skin="quidel"] .shell { box-shadow: none; }
+[data-skin="quidel"] .screen-title { font-family: 'Outfit', sans-serif; font-size: 27px; font-weight: 700; color: var(--color-primary); }
+[data-skin="quidel"] .btn-primary {
+  background: var(--color-accent); color: #fff;
+  border-radius: var(--radius-md);
+  font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600;
+  box-shadow: 0 4px 16px rgba(232,93,4,.3);
+}
+[data-skin="quidel"] .btn-outline {
+  border: 2px solid var(--color-primary); color: var(--color-primary);
+  border-radius: var(--radius-md);
+  font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600;
+}
+[data-skin="quidel"] .input {
+  border-radius: var(--radius-md); border: 1.5px solid var(--color-border);
+  font-family: 'Outfit', sans-serif; font-size: 16px;
+}
+[data-skin="quidel"] .input:focus { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(232,93,4,.12); }
+[data-skin="quidel"] .field label { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .8px; color: var(--color-primary); }
+[data-skin="quidel"] .brand-icon {
+  background: var(--color-accent); border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(232,93,4,.35);
+}
+[data-skin="quidel"] .brand-name { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--color-primary); }
+[data-skin="quidel"] .hero-badge {
+  background: #FFF1E8; color: var(--color-accent);
+  border-radius: 999px; font-family: 'Outfit', sans-serif; font-weight: 700;
+  border: 1px solid rgba(232,93,4,.2);
+}
+[data-skin="quidel"] .chip { border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-weight: 500; border: 1.5px solid var(--color-border); }
+[data-skin="quidel"] .hero-title { font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; color: var(--color-primary); }
+[data-skin="quidel"] .hero-title em { font-style: normal; color: var(--color-accent); }
+[data-skin="quidel"] .hero-sub { color: var(--color-muted); font-family: 'Outfit', sans-serif; }
+[data-skin="quidel"] .welcome-hero {
+  background: linear-gradient(160deg, #EEF2F9 0%, #fff 65%);
+  margin: -44px -28px 24px; padding: 52px 28px 28px;
+}
+[data-skin="quidel"] .otp-box {
+  border-radius: var(--radius-sm); border: 1.5px solid var(--color-border);
+  font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700;
+}
+[data-skin="quidel"] .otp-box:focus { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(232,93,4,.12); }
+[data-skin="quidel"] .otp-box.filled { background: #FFF1E8; border-color: var(--color-accent); }
+[data-skin="quidel"] .pw-reqs { background: #EEF2F9; border-radius: var(--radius-md); }
+[data-skin="quidel"] .back-btn { color: var(--color-primary); font-family: 'Outfit', sans-serif; font-weight: 600; }
+[data-skin="quidel"] .auth-footer button { color: var(--color-accent); }
+[data-skin="quidel"] .link-right button { color: var(--color-accent); }
+[data-skin="quidel"] .progress-dots .dot.active { background: var(--color-accent); }
+[data-skin="quidel"] .select-wrapper select { border-radius: var(--radius-md); font-family: 'Outfit', sans-serif; border: 1.5px solid var(--color-border); }
+[data-skin="quidel"] .consent { font-family: 'Outfit', sans-serif; }
+[data-skin="quidel"] .modal-card { border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+[data-skin="quidel"] .modal-title { font-family: 'Outfit', sans-serif; font-weight: 700; }
+/* Orange accent divider stripe */
+[data-skin="quidel"] .quidel-stripe {
+  display: block; height: 4px;
+  background: linear-gradient(90deg, var(--color-accent) 0%, #ff8c42 100%);
+  margin: 0 -28px 28px; width: calc(100% + 56px);
+}
+[data-skin="quidel"] .toggle-label { font-family: 'Outfit', sans-serif; font-weight: 600; }
+[data-skin="quidel"] .check-row label { font-family: 'Outfit', sans-serif; }
+[data-skin="quidel"] .check-row label a { color: var(--color-accent); }
+[data-skin="quidel"] #screen-done .brand-icon { box-shadow: 0 8px 28px rgba(232,93,4,.4); }
+
+/* ══════════════════════════════════════════════════
+   ③ ABBOTT BINAXNOW — Matched to actual product box
+   Deep navy #13165C → purple #3B1572 gradient
+   Yellow #F5C512 badge · Cyan #00B8E2 accents
+   Barlow Condensed Italic (BinaxNOW wordmark style)
+   Full dark UI — box is dark, app should be too
+══════════════════════════════════════════════════ */
+[data-skin="abbott"] {
+  --color-primary:    #F5C512;
+  --color-primary-lt: rgba(245,197,18,.15);
+  --color-accent:     #00B8E2;
+  --color-bg:         #0f1254;
+  --color-surface:    #1a1f6a;
+  --color-text:       #ffffff;
+  --color-muted:      #8fa4d8;
+  --color-border:     rgba(255,255,255,.12);
+  --color-error:      #ff6b6b;
+  --color-success:    #00B8E2;
+  --font-display:     'Barlow Condensed', sans-serif;
+  --font-body:        'Barlow', sans-serif;
+  --radius-xs:        4px;
+  --radius-sm:        8px;
+  --radius-md:        12px;
+  --radius-lg:        18px;
+  --radius-xl:        26px;
+  --btn-shadow:       0 4px 20px rgba(245,197,18,.35);
+}
+
+/* Dark gradient shell — mimics the box face */
+[data-skin="abbott"] .shell {
+  background: linear-gradient(160deg, #13165C 0%, #2a1060 55%, #13165C 100%);
+}
+[data-skin="abbott"] .screen {
+  background: transparent;
+}
+
+/* Subtle noise/depth on screens */
+[data-skin="abbott"] .screen::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 70% 20%, rgba(100,40,180,.25) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+[data-skin="abbott"] .screen > * { position: relative; z-index: 1; }
+
+/* ── Welcome hero — box face recreation ── */
+[data-skin="abbott"] .welcome-hero {
+  background: transparent;
+  margin: -44px -28px 28px;
+  padding: 52px 28px 32px;
+  text-align: left;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+/* Purple radial glow — top right, like the box */
+[data-skin="abbott"] .welcome-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(120,40,220,.55) 0%, transparent 70%);
+  pointer-events: none;
+}
+[data-skin="abbott"] .welcome-hero > * { position: relative; z-index: 1; }
+
+/* BinaxNOW wordmark style — large italic condensed */
+[data-skin="abbott"] .hero-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic;
+  font-size: 52px; font-weight: 800;
+  color: #ffffff;
+  line-height: .95;
+  letter-spacing: -1px;
+  text-align: left; max-width: 100%;
+}
+[data-skin="abbott"] .hero-title em {
+  font-style: italic;
+  color: var(--color-primary);
+}
+/* Abbott logo badge style */
+[data-skin="abbott"] .brand-icon {
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.25);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+[data-skin="abbott"] .brand-icon svg { stroke: #fff; }
+[data-skin="abbott"] .brand-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic; font-size: 22px; font-weight: 800;
+  color: #ffffff; letter-spacing: .5px;
+}
+[data-skin="abbott"] .brand-tagline { color: var(--color-muted); font-family: 'Barlow', sans-serif; }
+
+/* Yellow COVID-19-style badge */
+[data-skin="abbott"] .hero-badge {
+  background: var(--color-primary);
+  color: #13165C;
+  border-radius: var(--radius-xs);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  border: none; box-shadow: 0 2px 12px rgba(245,197,18,.4);
+  text-transform: uppercase;
+  padding: 5px 12px;
+}
+/* Cyan chip style — "EASY · FAST" from box */
+[data-skin="abbott"] .chip {
+  background: rgba(0,184,226,.12);
+  border: 1px solid rgba(0,184,226,.4);
+  border-radius: var(--radius-xs);
+  color: var(--color-accent);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 11px;
+  letter-spacing: .5px;
+}
+[data-skin="abbott"] .hero-sub {
+  color: rgba(255,255,255,.75);
+  font-family: 'Barlow', sans-serif; font-size: 13px;
+}
+[data-skin="abbott"] .hero-chips { justify-content: flex-start; }
+[data-skin="abbott"] .welcome-actions .btn-outline {
+  border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.07);
+}
+
+/* ── Typography ── */
+[data-skin="abbott"] .screen-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic; font-size: 34px; font-weight: 800;
+  color: #ffffff; letter-spacing: -.3px;
+}
+[data-skin="abbott"] .screen-sub { font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--color-muted); }
+[data-skin="abbott"] .screen-sub strong { color: rgba(255,255,255,.9); }
+
+/* ── Buttons ── */
+[data-skin="abbott"] .btn-primary {
+  background: var(--color-primary); color: #13165C;
+  border-radius: var(--radius-md);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic; font-size: 18px; font-weight: 800;
+  letter-spacing: .5px;
+  box-shadow: var(--btn-shadow);
+}
+[data-skin="abbott"] .btn-outline {
+  border: 1.5px solid rgba(255,255,255,.25); color: rgba(255,255,255,.85);
+  border-radius: var(--radius-md); background: rgba(255,255,255,.06);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic; font-size: 18px; font-weight: 700;
+}
+
+/* ── Inputs — frosted dark ── */
+[data-skin="abbott"] .input {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.08);
+  color: #ffffff;
+  font-family: 'Barlow', sans-serif; font-size: 16px;
+  -webkit-text-fill-color: #fff;
+}
+[data-skin="abbott"] .input::placeholder { color: rgba(255,255,255,.3); }
+[data-skin="abbott"] .input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(245,197,18,.2);
+  background: rgba(255,255,255,.12);
+}
+[data-skin="abbott"] .field label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+  color: var(--color-accent); text-transform: uppercase;
+}
+[data-skin="abbott"] .input-icon { color: var(--color-muted); }
+
+/* ── OTP ── */
+[data-skin="abbott"] .otp-box {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px; font-weight: 800;
+}
+[data-skin="abbott"] .otp-box:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(245,197,18,.2);
+}
+[data-skin="abbott"] .otp-box.filled {
+  background: rgba(245,197,18,.15);
+  border-color: var(--color-primary);
+}
+
+/* ── Password requirements ── */
+[data-skin="abbott"] .pw-reqs {
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+}
+[data-skin="abbott"] .req { font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--color-muted); }
+[data-skin="abbott"] .req.met { color: var(--color-accent); }
+[data-skin="abbott"] .req-dot { border-color: rgba(255,255,255,.2); }
+[data-skin="abbott"] .req.met .req-dot { background: var(--color-accent); border-color: var(--color-accent); }
+
+/* ── Navigation ── */
+[data-skin="abbott"] .back-btn { color: var(--color-accent); font-family: 'Barlow', sans-serif; font-weight: 600; }
+[data-skin="abbott"] .back-btn svg { stroke: var(--color-accent); }
+[data-skin="abbott"] .auth-footer { font-family: 'Barlow', sans-serif; color: var(--color-muted); }
+[data-skin="abbott"] .auth-footer button { color: var(--color-primary); font-weight: 700; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; letter-spacing: .3px; }
+[data-skin="abbott"] .link-right button { color: var(--color-primary); font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 600; }
+[data-skin="abbott"] .progress-dots .dot { background: rgba(255,255,255,.15); }
+[data-skin="abbott"] .progress-dots .dot.active { background: var(--color-primary); box-shadow: 0 0 8px rgba(245,197,18,.5); }
+
+/* ── Selects ── */
+[data-skin="abbott"] .select-wrapper select {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.08);
+  color: #fff; font-family: 'Barlow', sans-serif;
+}
+[data-skin="abbott"] .select-wrapper::after { border-top-color: var(--color-muted); }
+
+/* ── Toggle & Checkbox ── */
+[data-skin="abbott"] .toggle-row { border-top-color: var(--color-border); }
+[data-skin="abbott"] .toggle-label { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: #fff; letter-spacing: .3px; }
+[data-skin="abbott"] .toggle-sub { font-family: 'Barlow', sans-serif; color: var(--color-muted); }
+[data-skin="abbott"] .toggle-track { background: rgba(255,255,255,.2); }
+[data-skin="abbott"] .toggle input:checked + .toggle-track { background: var(--color-primary); }
+[data-skin="abbott"] .check-box { border-color: rgba(255,255,255,.25); background: transparent; }
+[data-skin="abbott"] .check-row.checked .check-box { background: var(--color-primary); border-color: var(--color-primary); }
+[data-skin="abbott"] .check-row.checked .check-box::after { border-color: #13165C; }
+[data-skin="abbott"] .check-row label { font-family: 'Barlow', sans-serif; color: var(--color-muted); }
+[data-skin="abbott"] .check-row label a { color: var(--color-accent); }
+
+/* ── Consent ── */
+[data-skin="abbott"] .consent { font-family: 'Barlow', sans-serif; color: var(--color-muted); font-size: 12px; }
+[data-skin="abbott"] .consent a { color: var(--color-accent); }
+
+/* ── Modal ── */
+[data-skin="abbott"] .modal-card {
+  background: #1a1f6a;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border-top: 3px solid var(--color-primary);
+}
+[data-skin="abbott"] .modal-title { font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; color: #fff; font-size: 24px; }
+[data-skin="abbott"] .modal-body { font-family: 'Barlow', sans-serif; color: var(--color-muted); }
+[data-skin="abbott"] .modal-close { background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); }
+
+/* ── Done screen ── */
+[data-skin="abbott"] #s-done { background: transparent; }
+[data-skin="abbott"] #s-done .screen-title { color: #fff; }
+[data-skin="abbott"] #s-done .brand-icon { box-shadow: 0 0 40px rgba(245,197,18,.5); border: 1.5px solid var(--color-primary); }
+[data-skin="abbott"] #s-done .screen-sub { color: var(--color-muted); }
+
+/* ── Nav bar ── */
+[data-skin="abbott"] .nav-indicator { background: rgba(255,255,255,.3); opacity: 1; }
+
+/* Abbott accent stripe */
+[data-skin="abbott"] .bd-accent-bar {
+  display: none;
+}
+[data-skin="abbott"] .abbott-stripe {
+  display: block; height: 3px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  margin: -44px -28px 28px; width: calc(100% + 56px);
+}
+
+
+/* ══════════════════════════════════════════════════
+   ④ iHEALTH — Matched to actual product box
+   Orange-red #E84511 · White · Clean bold sans
+   Outfit · The "3-in-1" box: bold orange panel, white body
+   Big "3" motif in hero, iHealth® wordmark style
+══════════════════════════════════════════════════ */
+[data-skin="ihealth"] {
+  --color-primary:    #E84511;
+  --color-primary-lt: #FEF0EB;
+  --color-accent:     #1a1a1a;
+  --color-bg:         #ffffff;
+  --color-surface:    #ffffff;
+  --color-text:       #1a1a1a;
+  --color-muted:      #6b6b6b;
+  --color-border:     #e8e8e8;
+  --color-error:      #E84511;
+  --color-success:    #2d8a4e;
+  --font-display:     'Outfit', sans-serif;
+  --font-body:        'Outfit', sans-serif;
+  --radius-xs:        6px;
+  --radius-sm:        10px;
+  --radius-md:        14px;
+  --radius-lg:        20px;
+  --radius-xl:        28px;
+  --btn-shadow:       0 4px 18px rgba(232,69,17,.35);
+}
+
+/* Full orange hero panel — replicates the box face */
+[data-skin="ihealth"] .welcome-hero {
+  position: relative;
+  background: var(--color-primary);
+  margin: -44px -28px 28px;
+  padding: 52px 28px 36px;
+  overflow: hidden;
+  align-items: flex-start;
+  text-align: left;
+  gap: 10px;
+  min-height: 260px;
+}
+/* Giant "3" background motif from the box */
+[data-skin="ihealth"] .welcome-hero::before {
+  content: '3';
+  position: absolute;
+  right: -18px; top: -20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 260px; font-weight: 800;
+  color: rgba(255,255,255,.12);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+[data-skin="ihealth"] .welcome-hero > * { position: relative; z-index: 1; }
+[data-skin="ihealth"] .hero-badge {
+  background: rgba(255,255,255,.22);
+  color: #fff; border: none; border-radius: 4px;
+  font-family: 'Outfit', sans-serif; font-weight: 700;
+  font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 4px 10px; box-shadow: none;
+}
+[data-skin="ihealth"] .hero-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 38px; font-weight: 800;
+  color: #ffffff; line-height: 1.0;
+  letter-spacing: -.5px; max-width: 100%;
+  text-align: left;
+}
+[data-skin="ihealth"] .hero-title em { font-style: normal; color: #fff; opacity: .9; }
+[data-skin="ihealth"] .hero-sub {
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  color: rgba(255,255,255,.8); text-align: left; max-width: 100%;
+}
+[data-skin="ihealth"] .hero-chips { justify-content: flex-start; }
+[data-skin="ihealth"] .chip {
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 4px; color: #fff;
+  font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 11px;
+  box-shadow: none;
+}
+
+/* iHealth® brand wordmark */
+[data-skin="ihealth"] .brand-icon {
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(232,69,17,.3);
+}
+[data-skin="ihealth"] .brand-name {
+  font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800;
+  color: var(--color-primary); letter-spacing: -.3px;
+}
+/* Superscript ® after brand name */
+[data-skin="ihealth"] .brand-name::after {
+  content: '®';
+  font-size: 11px; font-weight: 400;
+  vertical-align: super; margin-left: 1px; opacity: .7;
+}
+[data-skin="ihealth"] .brand-tagline {
+  font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--color-muted);
+  font-weight: 400;
+}
+
+/* Screens */
+[data-skin="ihealth"] .screen { background: #fff; }
+[data-skin="ihealth"] .screen-title {
+  font-family: 'Outfit', sans-serif; font-size: 27px; font-weight: 800;
+  color: var(--color-text); letter-spacing: -.3px;
+}
+[data-skin="ihealth"] .screen-sub { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 400; }
+
+/* Orange accent line at top of inner screens */
+[data-skin="ihealth"] .quidel-stripe {
+  display: block; height: 4px;
+  background: var(--color-primary);
+  margin: -44px -28px 30px; width: calc(100% + 56px);
+}
+
+/* Buttons */
+[data-skin="ihealth"] .btn-primary {
+  background: var(--color-primary); color: #fff;
+  border-radius: var(--radius-md);
+  font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700;
+  box-shadow: var(--btn-shadow);
+}
+[data-skin="ihealth"] .btn-outline {
+  border: 2px solid var(--color-primary); color: var(--color-primary);
+  border-radius: var(--radius-md);
+  font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700;
+  background: #fff;
+}
+
+/* Inputs */
+[data-skin="ihealth"] .input {
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: #fff; font-family: 'Outfit', sans-serif; font-size: 16px;
+}
+[data-skin="ihealth"] .input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(232,69,17,.12);
+}
+[data-skin="ihealth"] .field label {
+  font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700;
+  color: var(--color-muted); letter-spacing: .6px; text-transform: uppercase;
+}
+
+/* OTP boxes */
+[data-skin="ihealth"] .otp-box {
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border);
+  font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 800;
+  background: #fff;
+}
+[data-skin="ihealth"] .otp-box:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(232,69,17,.12); }
+[data-skin="ihealth"] .otp-box.filled { background: #FEF0EB; border-color: var(--color-primary); }
+
+/* Password requirements */
+[data-skin="ihealth"] .pw-reqs { background: #FEF0EB; border-radius: var(--radius-md); border-left: 3px solid var(--color-primary); }
+[data-skin="ihealth"] .req { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; }
+
+/* Nav & links */
+[data-skin="ihealth"] .back-btn { color: var(--color-primary); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; }
+[data-skin="ihealth"] .auth-footer { font-family: 'Outfit', sans-serif; font-weight: 500; }
+[data-skin="ihealth"] .auth-footer button { color: var(--color-primary); font-weight: 700; }
+[data-skin="ihealth"] .link-right button { color: var(--color-primary); font-family: 'Outfit', sans-serif; font-weight: 600; }
+[data-skin="ihealth"] .progress-dots .dot { background: var(--color-border); }
+[data-skin="ihealth"] .progress-dots .dot.active { background: var(--color-primary); }
+[data-skin="ihealth"] .select-wrapper select {
+  border-radius: var(--radius-md); border: 1.5px solid var(--color-border);
+  font-family: 'Outfit', sans-serif; font-weight: 500; background: #fff;
+}
+[data-skin="ihealth"] .consent { font-family: 'Outfit', sans-serif; font-weight: 400; font-size: 12px; }
+[data-skin="ihealth"] .toggle-row { border-top-color: var(--color-border); }
+[data-skin="ihealth"] .toggle-label { font-family: 'Outfit', sans-serif; font-weight: 700; }
+[data-skin="ihealth"] .toggle-sub { font-family: 'Outfit', sans-serif; font-size: 12px; }
+[data-skin="ihealth"] .check-row label { font-family: 'Outfit', sans-serif; font-weight: 400; }
+[data-skin="ihealth"] .check-row label a { color: var(--color-primary); }
+[data-skin="ihealth"] .modal-card { border-radius: var(--radius-xl) var(--radius-xl) 0 0; border-top: 4px solid var(--color-primary); }
+[data-skin="ihealth"] .modal-title { font-family: 'Outfit', sans-serif; font-weight: 800; }
+[data-skin="ihealth"] .nav-indicator { background: var(--color-primary); opacity: .3; }
+[data-skin="ihealth"] #screen-done .brand-icon { box-shadow: 0 10px 32px rgba(232,69,17,.4); }
+/* Done screen — orange accent background circle */
+[data-skin="ihealth"] #s-done {
+  background: linear-gradient(160deg, #FEF0EB 0%, #fff 50%);
+}
+[data-skin="ihealth"] .ihealth-rapid-label {
+  display: block;
+  font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,.75); letter-spacing: .3px;
+  margin-top: -8px;
+}
+/* iHealth hero title override — shows 3-in-1 product copy */
+[data-skin="ihealth"] .hero-title-default { display: none; }
+[data-skin="ihealth"] .hero-title-ihealth { display: block; }
+/* Abbott hero title override */
+[data-skin="abbott"] .hero-title-default { display: none; }
+[data-skin="abbott"] .hero-title-abbott  { display: block; }
+[data-skin="abbott"] .abbott-made-usa    { display: block !important; }
+/* Abbott hero title — massive italic like BinaxNOW wordmark */
+[data-skin="abbott"] .hero-title-abbott { font-size: 58px; line-height: .9; }
+
+/* ══════════════════════════════════════════════════
+   ⑤ DEFAULT MEDICAL — Boring Generic EHR
+   #4B6CB7 dull blue · #F9FAFB white-gray
+   PT Sans · looks like your insurance portal from 2014
+══════════════════════════════════════════════════ */
+[data-skin="default"] {
+  --color-primary:    #3d5fa0;
+  --color-primary-lt: #eef1f8;
+  --color-accent:     #5a7fc4;
+  --color-bg:         #f4f5f7;
+  --color-surface:    #ffffff;
+  --color-text:       #2d3748;
+  --color-muted:      #718096;
+  --color-border:     #cbd5e0;
+  --color-error:      #c53030;
+  --color-success:    #276749;
+  --font-display:     'PT Sans', system-ui, sans-serif;
+  --font-body:        'PT Sans', system-ui, sans-serif;
+  --radius-xs:        3px;
+  --radius-sm:        4px;
+  --radius-md:        4px;
+  --radius-lg:        6px;
+  --radius-xl:        8px;
+  --btn-shadow:       none;
+}
+[data-skin="default"] .screen { background: var(--color-bg); }
+[data-skin="default"] .screen-title { font-family: 'PT Sans', sans-serif; font-size: 22px; font-weight: 700; color: var(--color-text); letter-spacing: 0; }
+[data-skin="default"] .screen-sub { font-family: 'PT Sans', sans-serif; font-size: 14px; }
+[data-skin="default"] .btn-primary {
+  background: var(--color-primary); color: #fff;
+  border-radius: var(--radius-sm); font-family: 'PT Sans', sans-serif;
+  font-size: 15px; font-weight: 700; box-shadow: none;
+  border: 1px solid #2e4a85;
+}
+[data-skin="default"] .btn-outline {
+  border: 1px solid var(--color-border); color: var(--color-text);
+  border-radius: var(--radius-sm); font-family: 'PT Sans', sans-serif;
+  font-size: 15px; background: #fff;
+}
+[data-skin="default"] .input {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: #fff; font-family: 'PT Sans', sans-serif;
+  font-size: 15px; box-shadow: inset 0 1px 2px rgba(0,0,0,.06);
+}
+[data-skin="default"] .input:focus { border-color: var(--color-primary); box-shadow: inset 0 1px 2px rgba(0,0,0,.06), 0 0 0 2px rgba(61,95,160,.18); }
+[data-skin="default"] .field label { font-family: 'PT Sans', sans-serif; font-size: 12px; font-weight: 700; color: var(--color-text); letter-spacing: .3px; text-transform: none; }
+[data-skin="default"] .brand-icon {
+  background: var(--color-primary); border-radius: var(--radius-sm);
+  box-shadow: none; border: 1px solid #2e4a85;
+}
+[data-skin="default"] .brand-name { font-family: 'PT Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--color-primary); letter-spacing: 0; }
+[data-skin="default"] .hero-badge {
+  background: var(--color-primary-lt); color: var(--color-primary);
+  border-radius: var(--radius-sm); font-family: 'PT Sans', sans-serif;
+  font-weight: 700; font-size: 12px; border: 1px solid var(--color-border);
+}
+[data-skin="default"] .chip {
+  background: #fff; border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm); font-family: 'PT Sans', sans-serif;
+  font-size: 12px; font-weight: 700;
+}
+[data-skin="default"] .hero-title { font-family: 'PT Sans', sans-serif; font-size: 28px; font-weight: 700; color: var(--color-text); }
+[data-skin="default"] .hero-title em { font-style: normal; color: var(--color-primary); text-decoration: none; }
+[data-skin="default"] .hero-sub { font-family: 'PT Sans', sans-serif; }
+[data-skin="default"] .welcome-hero {
+  background: linear-gradient(180deg, #eef1f8 0%, #f4f5f7 70%);
+  margin: -44px -28px 20px; padding: 52px 28px 28px;
+  border-bottom: 1px solid var(--color-border);
+}
+[data-skin="default"] .otp-box {
+  border-radius: var(--radius-sm); border: 1px solid var(--color-border);
+  font-family: 'PT Sans', sans-serif; font-size: 22px; font-weight: 700;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.06);
+}
+[data-skin="default"] .otp-box:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(61,95,160,.18); }
+[data-skin="default"] .otp-box.filled { background: #eef1f8; }
+[data-skin="default"] .pw-reqs { background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+[data-skin="default"] .req { font-family: 'PT Sans', sans-serif; font-size: 12px; }
+[data-skin="default"] .back-btn { color: var(--color-primary); font-family: 'PT Sans', sans-serif; font-weight: 700; font-size: 14px; }
+[data-skin="default"] .auth-footer { font-family: 'PT Sans', sans-serif; font-size: 13px; }
+[data-skin="default"] .auth-footer button { color: var(--color-primary); font-weight: 700; }
+[data-skin="default"] .link-right button { color: var(--color-primary); font-family: 'PT Sans', sans-serif; font-size: 13px; }
+[data-skin="default"] .progress-dots .dot.active { background: var(--color-primary); }
+[data-skin="default"] .select-wrapper select { border-radius: var(--radius-sm); border: 1px solid var(--color-border); font-family: 'PT Sans', sans-serif; background: #fff; }
+[data-skin="default"] .consent { font-family: 'PT Sans', sans-serif; font-size: 12px; }
+[data-skin="default"] .toggle-label { font-family: 'PT Sans', sans-serif; font-weight: 700; }
+[data-skin="default"] .check-row label { font-family: 'PT Sans', sans-serif; }
+[data-skin="default"] .modal-card { border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+[data-skin="default"] .modal-title { font-family: 'PT Sans', sans-serif; font-weight: 700; }
+[data-skin="default"] #screen-done .brand-icon { box-shadow: none; }
+/* Boring page header rule */
+[data-skin="default"] .default-header-rule {
+  display: block; height: 2px;
+  background: var(--color-border);
+  margin: -44px -28px 28px; width: calc(100% + 56px);
+}
+
+/* ══════════════════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════════════════ */
+.brand-mark { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 0 4px; }
+.brand-icon { width: 50px; height: 50px; background: var(--color-primary); border-radius: var(--radius-md); display: grid; place-items: center; box-shadow: var(--btn-shadow); transition: all .3s; }
+.brand-icon svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.brand-name { font-family: var(--font-display); font-size: 19px; color: var(--color-text); letter-spacing: -.2px; transition: all .3s; }
+.brand-tagline { font-size: 11px; color: var(--color-muted); text-align: center; max-width: 200px; line-height: 1.5; }
+
+.screen-title { font-family: var(--font-display); font-size: 26px; line-height: 1.2; letter-spacing: -.3px; margin-bottom: 6px; color: var(--color-text); transition: all .3s; }
+.screen-sub { font-size: 14px; color: var(--color-muted); line-height: 1.6; margin-bottom: 22px; transition: all .3s; }
+.screen-sub strong { color: var(--color-text); font-weight: 600; }
+
+.back-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 500; color: var(--color-primary); background: none; border: none; padding: 4px 0; margin-bottom: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all .3s; font-family: var(--font-body); }
+.back-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+.field { margin-bottom: 14px; position: relative; }
+.field label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--color-muted); margin-bottom: 6px; font-family: var(--font-body); transition: all .3s; }
+.input { width: 100%; padding: 14px 16px; background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-body); font-size: 16px; color: var(--color-text); outline: none; transition: border-color .2s, box-shadow .2s, border-radius .3s; -webkit-appearance: none; }
+.input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent); }
+.input::placeholder { color: var(--color-border); }
+.input-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--color-muted); cursor: pointer; opacity: .5; }
+.input-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn { width: 100%; padding: 15px; border-radius: var(--radius-md); font-family: var(--font-body); font-size: 16px; font-weight: 600; border: none; cursor: pointer; transition: transform .15s, box-shadow .15s, opacity .15s, border-radius .3s; -webkit-tap-highlight-color: transparent; }
+.btn:active { transform: scale(.975); }
+.btn-primary { background: var(--color-primary); color: #fff; box-shadow: var(--btn-shadow); }
+.btn-ghost { background: transparent; color: var(--color-primary); font-size: 14px; font-weight: 500; padding: 12px; }
+.btn-outline { background: transparent; border: 1.5px solid var(--color-border); color: var(--color-text); }
+
+.auth-footer { margin-top: 16px; text-align: center; font-size: 14px; color: var(--color-muted); font-family: var(--font-body); transition: all .3s; }
+.auth-footer button { background: none; border: none; padding: 0; color: var(--color-primary); font-weight: 600; font-family: var(--font-body); font-size: 14px; cursor: pointer; }
+.link-right { text-align: right; margin-top: -6px; margin-bottom: 16px; }
+.link-right button { background: none; border: none; color: var(--color-primary); font-size: 13px; font-family: var(--font-body); font-weight: 500; cursor: pointer; }
+
+.otp-row { display: flex; gap: 10px; justify-content: center; margin: 10px 0 22px; }
+.otp-box { width: 44px; height: 54px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); font-size: 24px; font-weight: 700; text-align: center; color: var(--color-text); outline: none; transition: border-color .2s, box-shadow .2s, border-radius .3s; caret-color: var(--color-primary); }
+.otp-box:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent); }
+.otp-box.filled { border-color: var(--color-primary); background: var(--color-primary-lt); }
+
+.pw-reqs { background: var(--color-primary-lt); border-radius: var(--radius-md); padding: 14px 16px; margin: 4px 0 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 4px; transition: border-radius .3s; }
+.req { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted); font-family: var(--font-body); transition: color .2s; }
+.req.met { color: var(--color-success); }
+.req-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--color-border); flex-shrink: 0; display: grid; place-items: center; transition: background .2s, border-color .2s; }
+.req.met .req-dot { background: var(--color-success); border-color: var(--color-success); }
+.req.met .req-dot::after { content: ''; width: 6px; height: 4px; border-left: 1.5px solid #fff; border-bottom: 1.5px solid #fff; transform: rotate(-45deg) translateY(-1px); }
+
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-top: 1px solid var(--color-border); margin-bottom: 12px; transition: all .3s; }
+.toggle-label { font-size: 14px; font-weight: 500; font-family: var(--font-body); }
+.toggle-sub { font-size: 12px; color: var(--color-muted); font-family: var(--font-body); }
+.toggle { position: relative; width: 44px; height: 26px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: var(--color-border); border-radius: 999px; cursor: pointer; transition: background .25s; }
+.toggle input:checked + .toggle-track { background: var(--color-primary); }
+.toggle-track::after { content: ''; position: absolute; left: 3px; top: 3px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform .25s; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+.check-row { display: flex; align-items: flex-start; gap: 12px; padding: 4px 0; }
+.check-box { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--color-border); flex-shrink: 0; margin-top: 1px; cursor: pointer; display: grid; place-items: center; transition: background .2s, border-color .2s; }
+.check-row.checked .check-box { background: var(--color-primary); border-color: var(--color-primary); }
+.check-row.checked .check-box::after { content: ''; width: 10px; height: 7px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); }
+.check-row label { font-size: 13px; color: var(--color-muted); line-height: 1.55; cursor: pointer; font-family: var(--font-body); }
+.check-row label a { color: var(--color-primary); font-weight: 600; text-decoration: none; }
+
+.select-wrapper { position: relative; }
+.select-wrapper select { width: 100%; padding: 14px 40px 14px 16px; background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-body); font-size: 16px; color: var(--color-text); -webkit-appearance: none; outline: none; cursor: pointer; transition: border-radius .3s; }
+.select-wrapper::after { content: ''; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--color-muted); pointer-events: none; }
+.date-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(4px); }
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-card { background: var(--color-surface); border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 28px 28px 36px; width: 100%; max-width: 430px; transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); text-align: center; position: relative; }
+.modal-overlay.open .modal-card { transform: translateY(0); }
+.modal-icon { width: 60px; height: 60px; border-radius: 50%; background: #fdeaea; display: grid; place-items: center; margin: 0 auto 14px; }
+.modal-icon svg { width: 26px; height: 26px; stroke: var(--color-error); fill: none; stroke-width: 2.2; }
+.modal-title { font-family: var(--font-display); font-size: 21px; margin-bottom: 8px; }
+.modal-body { font-size: 14px; color: var(--color-muted); line-height: 1.6; margin-bottom: 22px; font-family: var(--font-body); }
+.modal-close { position: absolute; top: 14px; right: 14px; background: var(--color-border); border: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: var(--color-muted); font-size: 15px; }
+
+.progress-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border); transition: background .3s, width .3s; }
+.dot.active { background: var(--color-primary); width: 20px; border-radius: 3px; }
+
+.spacer { flex: 1; min-height: 16px; }
+.gap-sm { height: 10px; }
+.gap-md { height: 20px; }
+.consent { font-size: 12px; color: var(--color-muted); line-height: 1.6; margin-bottom: 18px; font-family: var(--font-body); }
+
+/* Welcome screen */
+.welcome-hero { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 36px 0 24px; text-align: center; transition: all .3s; }
+.hero-badge { background: var(--color-surface); border-radius: 999px; padding: 6px 14px; font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--color-primary); box-shadow: 0 2px 10px rgba(0,0,0,.06); transition: all .3s; font-family: var(--font-body); }
+.hero-title { font-family: var(--font-display); font-size: 34px; line-height: 1.1; letter-spacing: -.4px; max-width: 270px; transition: all .3s; }
+.hero-title em { font-style: italic; color: var(--color-primary); }
+.hero-sub { font-size: 14px; color: var(--color-muted); max-width: 240px; line-height: 1.6; font-family: var(--font-body); transition: all .3s; }
+.hero-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.chip { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 999px; padding: 5px 12px; font-size: 11px; font-weight: 500; color: var(--color-text); font-family: var(--font-body); transition: all .3s; }
+.welcome-actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 14px; }
+
+/* Skin-specific stripe elements (hidden by default) */
+.bd-accent-bar, .quidel-stripe, .default-header-rule, .abbott-stripe { display: none; }
+[data-skin="bd"]      .bd-accent-bar      { display: block; height: 3px; background: linear-gradient(90deg, #003865 60%, #009A44 100%); margin: -44px -28px 28px; width: calc(100% + 56px); }
+[data-skin="quidel"]  .quidel-stripe      { display: block; height: 4px; background: linear-gradient(90deg, var(--color-accent) 0%, #ff8c42 100%); margin: -44px -28px 26px; width: calc(100% + 56px); }
+[data-skin="default"] .default-header-rule{ display: block; height: 2px; background: var(--color-border); margin: -44px -28px 26px; width: calc(100% + 56px); }
+[data-skin="ihealth"]  .quidel-stripe     { display: block; height: 4px; background: #E84511; margin: -44px -28px 30px; width: calc(100% + 56px); }
+[data-skin="abbott"]   .abbott-stripe     { display: block; height: 3px; background: linear-gradient(90deg, #F5C512 0%, #00B8E2 100%); margin: -44px -28px 28px; width: calc(100% + 56px); }
+
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD — screens that appear post-auth
+══════════════════════════════════════════════════ */
+
+/* Screens with tab bar */
+.screen.has-tabs {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+}
+/* Scrollable content area inside tabbed screens (for dashboard, history) */
+.screen.has-tabs > *:not(.tab-bar) {
+  flex-shrink: 0;
+}
+/* Dashboard and history need their main content to grow and scroll */
+#s-dashboard > .tab-bar,
+#s-history > .tab-bar,
+#s-kit-contents > .tab-bar { flex-shrink: 0; }
+
+/* ── Bottom Tab Bar ── */
+.tab-bar {
+  position: sticky; bottom: 0; left: 0; right: 0;
+  height: 68px;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex; align-items: stretch;
+  z-index: 10;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  flex-shrink: 0;
+  width: 100%;
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  background: none; border: none; cursor: pointer;
+  color: var(--color-muted); font-family: var(--font-body);
+  font-size: 10px; font-weight: 500; letter-spacing: .2px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s;
+}
+.tab-item.active { color: var(--color-primary); }
+.tab-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tab-item.active svg { stroke-width: 2.2; }
+
+/* Skin: Abbott dark tab bar */
+[data-skin="abbott"] .tab-bar { background: #1a1f6a; border-top-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .tab-item { color: rgba(255,255,255,.35); }
+[data-skin="abbott"] .tab-item.active { color: var(--color-primary); }
+
+/* ── Dashboard greeting header ── */
+.dash-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.dash-date {
+  font-size: 12px; color: var(--color-muted); font-family: var(--font-body);
+  font-weight: 500; margin-bottom: 2px;
+}
+.dash-greeting {
+  font-family: var(--font-display);
+  font-size: 26px; line-height: 1.1;
+  color: var(--color-text);
+}
+.dash-greeting span { color: var(--color-primary); }
+.dash-bell {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+}
+.dash-bell svg { width: 20px; height: 20px; stroke: var(--color-muted); fill: none; stroke-width: 1.8; }
+
+[data-skin="abbott"] .dash-greeting { color: #fff; }
+[data-skin="abbott"] .dash-greeting span { color: var(--color-primary); }
+[data-skin="abbott"] .dash-date { color: var(--color-muted); }
+[data-skin="abbott"] .dash-bell { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); }
+
+/* ── Hero image card ── */
+.hero-photo-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  height: 200px;
+  margin-bottom: 20px;
+  position: relative;
+  background: var(--color-primary-lt);
+  flex-shrink: 0;
+}
+/* Person silhouette SVG illustration inside hero */
+.hero-photo-card .hero-scene {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end;
+  justify-content: flex-end;
+}
+.hero-photo-card .hero-bg-grad {
+  position: absolute; inset: 0;
+}
+.hero-photo-card .hero-person {
+  width: 160px; height: 180px;
+  position: relative; z-index: 1;
+  margin-right: 10px;
+}
+.hero-tagline {
+  position: absolute; bottom: 16px; left: 18px; z-index: 2;
+  max-width: 160px;
+}
+.hero-tagline-sub {
+  font-size: 11px; font-family: var(--font-body); font-weight: 600;
+  color: rgba(255,255,255,.8); text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 3px;
+}
+.hero-tagline-title {
+  font-family: var(--font-display); font-size: 22px; font-weight: 700;
+  color: #fff; line-height: 1.2;
+}
+
+/* ── Take a Test card ── */
+.test-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+.test-card-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--color-primary);
+  font-family: var(--font-body); margin-bottom: 6px;
+}
+.test-card-title {
+  font-family: var(--font-display); font-size: 20px; font-weight: 700;
+  color: var(--color-text); margin-bottom: 6px;
+}
+.test-card-sub {
+  font-size: 13px; color: var(--color-muted);
+  font-family: var(--font-body); line-height: 1.55; margin-bottom: 18px;
+}
+[data-skin="abbott"] .test-card { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .test-card-title { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-size: 22px; }
+[data-skin="abbott"] .test-card-sub { color: var(--color-muted); font-family: 'Barlow', sans-serif; }
+
+/* ── History items ── */
+.history-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 10px;
+}
+
+/* ══════════════════════════════════════════════════
+   BARCODE / SCANNER SCREENS
+══════════════════════════════════════════════════ */
+
+/* Scan intro — camera preview fills screen */
+.scan-intro-screen {
+  padding: 0 !important;
+  background: #1a1a1a !important;
+}
+.camera-preview {
+  position: absolute; inset: 0;
+  background: #222;
+  overflow: hidden;
+}
+/* Simulated camera noise texture */
+.camera-preview::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(80,60,40,.5) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 70%, rgba(40,40,60,.6) 0%, transparent 50%),
+    linear-gradient(180deg, #1a1a1a 0%, #2a2520 40%, #1c1c1c 100%);
+  z-index: 0;
+}
+/* Simulated box on table */
+.camera-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 200px; left: 50%; transform: translateX(-50%);
+  width: 240px; height: 120px;
+  background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 100%);
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+  z-index: 1;
+}
+.barcode-highlight {
+  position: absolute;
+  bottom: 218px; left: 50%; transform: translateX(-50%);
+  width: 180px; height: 60px;
+  border: 3px solid var(--color-primary, #E84511);
+  border-radius: 4px;
+  z-index: 2;
+  box-shadow: 0 0 0 2000px rgba(0,0,0,.45);
+  animation: barcode-pulse 1.6s ease-in-out infinite;
+}
+@keyframes barcode-pulse {
+  0%, 100% { border-color: var(--color-primary, #E84511); box-shadow: 0 0 0 2000px rgba(0,0,0,.45), 0 0 12px rgba(255,120,50,.4); }
+  50% { border-color: #ffaa66; box-shadow: 0 0 0 2000px rgba(0,0,0,.45), 0 0 20px rgba(255,150,80,.7); }
+}
+/* Barcode lines drawn in CSS on the simulated box */
+.barcode-lines {
+  position: absolute;
+  bottom: 230px; left: 50%; transform: translateX(-50%);
+  width: 160px; height: 36px;
+  z-index: 3;
+  display: flex; gap: 3px; align-items: stretch; padding: 0 4px;
+  overflow: hidden;
+}
+.barcode-lines span {
+  flex: 1; background: #1a1a1a;
+  border-radius: 1px;
+  opacity: .8;
+}
+.barcode-lines span:nth-child(even) { flex: 1.6; opacity: .9; }
+.barcode-lines span:nth-child(3n) { flex: 0.7; }
+
+/* Close X button over camera */
+.camera-close {
+  position: absolute; top: 48px; right: 18px; z-index: 20;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(0,0,0,.45); border: none;
+  display: grid; place-items: center; cursor: pointer; color: #fff;
+  font-size: 18px; line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Bottom sheet overlay on scan intro */
+.scan-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
+  background: var(--color-bg);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 28px 36px;
+  text-align: center;
+}
+.scan-sheet-title {
+  font-family: var(--font-display); font-size: 24px; font-weight: 700;
+  color: var(--color-text); margin-bottom: 6px;
+}
+.scan-sheet-sub {
+  font-size: 13px; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 22px; line-height: 1.5;
+}
+[data-skin="abbott"] .scan-sheet { background: #1a1f6a; }
+[data-skin="abbott"] .scan-sheet-title { font-family: 'Barlow Condensed', sans-serif; font-style: italic; color: #fff; }
+[data-skin="abbott"] .scan-sheet-sub { font-family: 'Barlow', sans-serif; }
+
+/* ── Active scanner screen ── */
+.active-scanner-screen {
+  padding: 0 !important;
+  background: #000 !important;
+}
+.scanner-camera {
+  position: absolute; inset: 0;
+  background: #111;
+  overflow: hidden;
+}
+.scanner-camera::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, #1a1a1a 0%, #000 100%);
+}
+/* Viewfinder corners */
+.viewfinder {
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -55%);
+  width: 220px; height: 140px;
+  z-index: 5;
+}
+.vf-corner {
+  position: absolute; width: 24px; height: 24px;
+}
+.vf-corner::before, .vf-corner::after {
+  content: ''; position: absolute; background: #fff; border-radius: 2px;
+}
+.vf-corner::before { width: 24px; height: 3px; top: 0; left: 0; }
+.vf-corner::after  { width: 3px; height: 24px; top: 0; left: 0; }
+.vf-corner.tr { top: 0; right: 0; transform: rotate(90deg); }
+.vf-corner.bl { bottom: 0; left: 0; transform: rotate(-90deg); }
+.vf-corner.br { bottom: 0; right: 0; transform: rotate(180deg); }
+.vf-corner.tl { top: 0; left: 0; }
+
+/* Animated scan line */
+.scan-line {
+  position: absolute;
+  left: 3px; right: 3px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary, #E84511) 30%, var(--color-primary, #E84511) 70%, transparent);
+  top: 3px; z-index: 6;
+  box-shadow: 0 0 8px var(--color-primary, #E84511);
+  animation: scan 2s ease-in-out infinite;
+}
+@keyframes scan {
+  0% { top: 6px; }
+  50% { top: calc(100% - 6px); }
+  100% { top: 6px; }
+}
+
+/* Dark overlay sides */
+.scanner-side-mask {
+  position: absolute; top: 0; bottom: 0; width: 28px;
+  background: rgba(0,0,0,.7); z-index: 4;
+}
+.scanner-side-mask.left { left: 0; }
+.scanner-side-mask.right { right: 0; }
+
+/* Scanner nav bar */
+.scanner-nav {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; align-items: center;
+  padding: 48px 18px 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 100%);
+}
+.scanner-nav-title {
+  font-family: var(--font-body); font-size: 16px; font-weight: 600;
+  color: #fff; text-align: center; flex: 1;
+}
+
+/* Scanner bottom instruction */
+.scanner-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
+  padding: 20px 28px 40px;
+  background: linear-gradient(0deg, rgba(0,0,0,.7) 0%, transparent 100%);
+  text-align: center;
+}
+.scanner-hint {
+  font-size: 14px; font-family: var(--font-body); font-weight: 500;
+  color: rgba(255,255,255,.85);
+  background: rgba(0,0,0,.45);
+  border-radius: 999px; padding: 10px 20px;
+  display: inline-block;
+}
+
+/* ══════════════════════════════════════════════════
+   KIT CONTENTS SCREEN
+══════════════════════════════════════════════════ */
+.kit-screen { padding-top: 28px !important; }
+
+.kit-image-area {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 22px;
+  overflow: hidden;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.kit-box-illustration {
+  position: relative; width: 200px; height: 140px;
+}
+/* Main box body */
+.kit-box-body {
+  position: absolute; inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.2);
+}
+.kit-box-left {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 55%;
+  background: #fff;
+  display: flex; flex-direction: column;
+  padding: 12px 10px;
+}
+.kit-box-right {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 47%;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: center;
+  padding: 12px 10px;
+  color: #fff;
+}
+.kit-brand-text {
+  font-family: var(--font-display); font-size: 9px; font-weight: 700;
+  color: var(--color-primary); letter-spacing: .5px; margin-bottom: 4px;
+}
+.kit-box-title-text {
+  font-family: var(--font-display); font-size: 13px; font-weight: 800;
+  color: #fff; line-height: 1.1;
+}
+.kit-box-subtitle-text {
+  font-size: 8px; font-weight: 600; color: rgba(255,255,255,.8);
+  font-family: var(--font-body); letter-spacing: .3px;
+  margin-top: 3px;
+}
+.kit-box-count {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
+  border-radius: 4px; font-size: 9px; font-weight: 700;
+  color: #fff; padding: 2px 6px; font-family: var(--font-body);
+}
+.kit-box-swab {
+  position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 100px;
+  background: linear-gradient(180deg, #e8e8e8 0%, #c0c0c0 100%);
+  border-radius: 8px 8px 3px 3px;
+  box-shadow: 2px 2px 6px rgba(0,0,0,.2);
+}
+
+/* Kit meta info */
+.kit-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--color-primary);
+  font-family: var(--font-body); margin-bottom: 4px;
+}
+.kit-name {
+  font-family: var(--font-display); font-size: 19px; font-weight: 700;
+  color: var(--color-text); line-height: 1.2; margin-bottom: 4px;
+}
+.kit-brand {
+  font-size: 13px; color: var(--color-muted); font-family: var(--font-body);
+  margin-bottom: 20px;
+}
+.kit-divider {
+  height: 1px; background: var(--color-border); margin-bottom: 18px;
+}
+.kit-contents-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 12px;
+}
+.kit-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--color-border);
+}
+.kit-item:last-child { border-bottom: none; }
+.kit-item-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--color-primary); flex-shrink: 0;
+}
+.kit-item-name {
+  flex: 1; font-size: 14px; font-family: var(--font-body);
+  color: var(--color-text); font-weight: 500;
+}
+.kit-item-qty {
+  font-size: 13px; font-weight: 700; font-family: var(--font-body);
+  color: var(--color-primary);
+  background: var(--color-primary-lt);
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 12px;
+}
+
+[data-skin="abbott"] .kit-name { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-size: 22px; }
+[data-skin="abbott"] .kit-item-name { color: rgba(255,255,255,.85); font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .kit-item { border-bottom-color: rgba(255,255,255,.08); }
+[data-skin="abbott"] .kit-divider { background: rgba(255,255,255,.1); }
+[data-skin="abbott"] .kit-brand { color: var(--color-muted); font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .kit-item-qty { background: rgba(245,197,18,.12); }
+[data-skin="abbott"] .kit-contents-label { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; }
+[data-skin="abbott"] .kit-screen { background: transparent; }
+[data-skin="bd"] .kit-screen { background: var(--color-bg); }
+[data-skin="bd"] .kit-name { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .3px; }
+[data-skin="bd"] .kit-eyebrow { font-family: 'Barlow Condensed', sans-serif; }
+[data-skin="bd"] .kit-contents-label { font-family: 'Barlow Condensed', sans-serif; }
+[data-skin="bd"] .kit-item-name { font-family: 'Barlow', sans-serif; }
+
+
+/* ══════════════════════════════════════════════════
+   INSTRUCTIONS SCREEN
+══════════════════════════════════════════════════ */
+.instr-screen { padding-top: 0 !important; }
+
+/* Sticky header bar */
+.instr-header {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--color-bg);
+  padding: 14px 20px 0;
+  flex-shrink: 0;
+}
+.instr-title-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.instr-title {
+  font-family: var(--font-display); font-size: 19px; font-weight: 700;
+  color: var(--color-primary); text-align: center; flex: 1;
+  letter-spacing: -.2px;
+}
+.instr-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--color-primary); font-size: 20px; line-height: 1;
+  padding: 4px; -webkit-tap-highlight-color: transparent;
+  font-weight: 300;
+}
+
+/* Step progress bar */
+.instr-progress-track {
+  height: 4px; background: var(--color-border);
+  border-radius: 999px; overflow: hidden;
+  margin-bottom: 0;
+}
+.instr-progress-fill {
+  height: 100%; background: var(--color-primary);
+  border-radius: 999px;
+  transition: width .4s cubic-bezier(.4,0,.2,1);
+}
+
+/* Step counter */
+.instr-step-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); padding: 10px 20px 0;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Body content area */
+.instr-body {
+  flex: 1; overflow-y: auto;
+  padding: 16px 24px 0;
+  display: flex; flex-direction: column; gap: 0;
+}
+.instr-refer-note {
+  font-size: 15px; color: var(--color-muted);
+  font-family: var(--font-body); line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Video player mockup */
+.video-player {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #111;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+  position: relative;
+}
+.video-thumb {
+  width: 100%; aspect-ratio: 16/10;
+  background: #1a1510;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Simulated video still — hands opening test kit */
+.video-thumb::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 35% 60%, rgba(80,60,30,.7) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 40%, rgba(40,30,20,.8) 0%, transparent 45%),
+    linear-gradient(160deg, #1a1206 0%, #2a1e08 40%, #111008 100%);
+}
+/* Test box on table */
+.video-thumb::after {
+  content: '';
+  position: absolute;
+  bottom: 25%; left: 15%;
+  width: 45%; height: 28%;
+  background: linear-gradient(135deg, #f5a030 0%, #e07020 45%, #1a1a7a 46%, #2a2a9a 100%);
+  border-radius: 3px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.7);
+  transform: rotate(-3deg);
+}
+.video-play-btn {
+  position: absolute; z-index: 2;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,.92);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  cursor: pointer;
+  transition: transform .15s, background .15s;
+}
+.video-play-btn:active { transform: translate(-50%, -50%) scale(.92); background: #fff; }
+.video-play-btn svg { width: 20px; height: 20px; fill: var(--color-primary); margin-left: 3px; }
+
+/* Video controls bar */
+.video-controls {
+  background: #1a1a1a;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.video-time {
+  font-size: 11px; color: rgba(255,255,255,.7);
+  font-family: var(--font-body); font-weight: 500; white-space: nowrap;
+}
+.video-scrub {
+  flex: 1; height: 3px;
+  background: rgba(255,255,255,.2);
+  border-radius: 999px; position: relative;
+}
+.video-scrub-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 32%; background: rgba(255,255,255,.7);
+  border-radius: 999px;
+}
+.video-scrub-dot {
+  position: absolute; right: calc(68% - 6px); top: 50%;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #fff; transform: translateY(-50%);
+}
+.video-more {
+  color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer;
+  line-height: 1; letter-spacing: 1px;
+}
+/* Video top toolbar */
+.video-toolbar {
+  position: absolute; top: 10px; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 12px; z-index: 3;
+}
+.video-toolbar-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+}
+.video-toolbar-btn svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 1.8; }
+
+/* Instr footer */
+.instr-footer {
+  padding: 12px 24px 20px;
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.contact-support-link {
+  background: none; border: none; cursor: pointer;
+  color: var(--color-primary); font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+}
+.contact-support-link:hover { text-decoration: underline; }
+
+/* Skin overrides */
+[data-skin="abbott"] .instr-header { background: transparent; }
+[data-skin="abbott"] .instr-title { color: var(--color-primary); font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-size: 22px; }
+[data-skin="abbott"] .instr-close { color: var(--color-primary); }
+[data-skin="abbott"] .instr-refer-note { font-family: 'Barlow', sans-serif; color: var(--color-muted); }
+[data-skin="abbott"] .instr-step-label { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; }
+[data-skin="abbott"] .contact-support-link { font-family: 'Barlow', sans-serif; }
+[data-skin="bd"] .instr-title { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-style: normal; font-size: 17px; }
+[data-skin="bd"] .instr-refer-note { font-family: 'Barlow', sans-serif; }
+[data-skin="bd"] .instr-step-label { font-family: 'Barlow Condensed', sans-serif; }
+[data-skin="bd"] .contact-support-link { font-family: 'Barlow', sans-serif; }
+[data-skin="quidel"] .instr-title { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .instr-title { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .instr-refer-note { font-family: 'Outfit', sans-serif; }
+
+
+/* ══════════════════════════════════════════════════
+   CAPTURE PHOTO SCREENS
+══════════════════════════════════════════════════ */
+
+/* ── Screen 1: Capture Intro ── */
+.capture-intro-screen {}
+
+.capture-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.capture-nav-title {
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  color: var(--color-primary); text-align: center; flex: 1;
+}
+.capture-nav-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--color-primary); font-size: 20px; font-weight: 300;
+  padding: 4px; -webkit-tap-highlight-color: transparent;
+  width: 32px;
+}
+
+.capture-section-title {
+  font-family: var(--font-display); font-size: 20px; font-weight: 700;
+  color: var(--color-text); margin-bottom: 10px;
+}
+.capture-instructions {
+  font-size: 14px; color: var(--color-muted);
+  font-family: var(--font-body); line-height: 1.65;
+  margin-bottom: 22px;
+}
+
+/* Example photo area — simulated test cassette on dark surface */
+.capture-example {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 3/2.4;
+  background: #1a1714;
+  position: relative;
+  margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.capture-example::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(60,45,25,.8) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(25,20,15,.9) 0%, transparent 45%),
+    linear-gradient(145deg, #1f1a14 0%, #2a231a 50%, #151210 100%);
+}
+/* The test cassette itself */
+.example-cassette {
+  position: relative; z-index: 2;
+  width: 68px; height: 175px;
+  background: linear-gradient(180deg, #f0ede8 0%, #e8e4de 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 12px 8px 10px;
+  gap: 10px;
+}
+.cassette-top-window {
+  width: 44px; height: 24px;
+  background: #d4cfc8;
+  border-radius: 5px;
+  border: 1.5px solid #b8b2aa;
+  flex-shrink: 0;
+}
+.cassette-result-window {
+  width: 44px; height: 72px;
+  background: #e8e3dc;
+  border-radius: 4px;
+  border: 1.5px solid #c8c2ba;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding-bottom: 10px; gap: 6px;
+  flex-shrink: 0;
+}
+.cassette-line-c {
+  width: 22px; height: 2.5px;
+  background: #e05030;
+  border-radius: 2px;
+}
+.cassette-line-t {
+  width: 22px; height: 2.5px;
+  background: #e05030;
+  border-radius: 2px;
+  opacity: 0; /* T line absent = negative result */
+}
+.cassette-label-c {
+  font-size: 6px; font-weight: 700;
+  color: #888; font-family: sans-serif;
+  align-self: flex-start; margin-left: 4px;
+}
+.example-label {
+  position: absolute; bottom: 10px; left: 12px;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.55);
+  font-family: var(--font-body); z-index: 3;
+  letter-spacing: .3px;
+}
+
+/* ── Screen 2: Camera — live viewfinder with overlay ── */
+.capture-camera-screen {
+  padding: 0 !important;
+  background: #000 !important;
+}
+.capture-cam-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 40% 55%, rgba(200,190,175,.18) 0%, transparent 55%),
+    linear-gradient(170deg, #c8c0b0 0%, #d4cdc0 40%, #bfb8ad 100%);
+  /* simulates paper surface from the reference photo */
+}
+/* Branded outline overlay — rounded rect around cassette zone */
+.capture-overlay-frame {
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -58%);
+  width: 140px; height: 300px;
+  border: 3px solid var(--color-primary, #6B63C4);
+  border-radius: 28px;
+  z-index: 5;
+  box-shadow: 0 0 0 2000px rgba(0,0,0,.38);
+  /* inner cassette hint */
+}
+/* Cassette outline ghost inside frame */
+.capture-overlay-frame::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 64px; height: 160px;
+  border: 1.5px dashed rgba(255,255,255,.25);
+  border-radius: 10px;
+}
+
+/* Camera nav */
+.capture-cam-nav {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; align-items: center;
+  padding: 48px 18px 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 100%);
+}
+/* Camera shutter bottom */
+.capture-shutter-area {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
+  padding: 20px 28px 48px;
+  background: linear-gradient(0deg, rgba(0,0,0,.55) 0%, transparent 100%);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.capture-hint-pill {
+  font-size: 13px; font-family: var(--font-body); font-weight: 500;
+  color: rgba(255,255,255,.85);
+  background: rgba(0,0,0,.4);
+  border-radius: 999px; padding: 8px 18px;
+}
+.shutter-btn {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: #fff; border: 4px solid rgba(255,255,255,.5);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform .1s; display: grid; place-items: center;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.3);
+}
+.shutter-btn:active { transform: scale(.9); }
+.shutter-btn::after {
+  content: ''; width: 52px; height: 52px; border-radius: 50%;
+  background: #fff; border: 2px solid #ddd;
+}
+
+/* ── Screen 3: Photo review — card overlay on blurred camera ── */
+.capture-review-screen {
+  padding: 0 !important;
+  background: #000 !important;
+}
+.review-backdrop {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 40% 55%, rgba(200,190,175,.18) 0%, transparent 55%),
+    linear-gradient(170deg, #c8c0b0 0%, #d4cdc0 40%, #bfb8ad 100%);
+  filter: blur(3px) brightness(.55);
+}
+.review-back-btn {
+  position: absolute; top: 48px; left: 18px; z-index: 20;
+  background: none; border: none; cursor: pointer;
+  color: var(--color-primary); -webkit-tap-highlight-color: transparent;
+}
+.review-back-btn svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.review-card {
+  position: absolute;
+  top: 60px; left: 16px; right: 16px; bottom: 16px;
+  background: var(--color-surface);
+  border-radius: 20px;
+  z-index: 10;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+/* The "photo" fills the card */
+.review-photo {
+  flex: 1;
+  background:
+    radial-gradient(ellipse at 40% 55%, rgba(200,190,175,.25) 0%, transparent 55%),
+    linear-gradient(170deg, #c8c0b8 0%, #d4cdc2 40%, #bfb8ae 100%);
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Cassette in review photo */
+.review-cassette {
+  width: 68px; height: 175px;
+  background: linear-gradient(180deg, #f0ede8 0%, #e8e4de 100%);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.3);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 12px 8px 10px; gap: 10px;
+}
+/* Review card action buttons */
+.review-actions {
+  padding: 16px 20px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  flex-shrink: 0;
+  background: var(--color-surface);
+}
+
+/* ── Screen 4: Processing spinner ── */
+.processing-screen {
+  background: var(--color-primary) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 24px;
+}
+.processing-spinner {
+  width: 64px; height: 64px;
+  border: 3px solid rgba(255,255,255,.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.processing-label {
+  font-family: var(--font-body); font-size: 17px; font-weight: 500;
+  color: #fff; letter-spacing: .2px;
+}
+
+/* Abbott dark overrides */
+[data-skin="abbott"] .capture-nav-title { font-family: 'Barlow Condensed', sans-serif; font-style: italic; }
+[data-skin="abbott"] .capture-section-title { font-family: 'Barlow Condensed', sans-serif; color: #fff; }
+[data-skin="abbott"] .capture-instructions { font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .review-card { background: #1a1f6a; }
+[data-skin="abbott"] .review-actions { background: #1a1f6a; }
+[data-skin="abbott"] .review-photo { background: radial-gradient(ellipse at 40% 55%, rgba(200,190,175,.15) 0%, transparent 55%), linear-gradient(170deg, #c8c0b8 0%, #d4cdc2 40%, #bfb8ae 100%); }
+[data-skin="bd"] .capture-nav-title { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 16px; }
+[data-skin="bd"] .capture-section-title { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+[data-skin="bd"] .capture-instructions { font-family: 'Barlow', sans-serif; }
+[data-skin="quidel"] .capture-nav-title { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .capture-nav-title { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .capture-instructions { font-family: 'Outfit', sans-serif; }
+
+/* ══════════════════════════════════════════════════
+   RESULTS RECORDING FLOW
+══════════════════════════════════════════════════ */
+
+/* Shared results nav — back + truncated kit name + X */
+.results-nav {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 0 20px; flex-shrink: 0;
+}
+.results-nav-back {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--color-primary); -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+}
+.results-nav-back svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.4; }
+.results-nav-kit {
+  flex: 1; font-size: 13px; font-family: var(--font-body);
+  color: var(--color-muted); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: center;
+}
+.results-nav-close {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--color-primary); font-size: 19px; font-weight: 300;
+  -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+}
+
+/* Question text */
+.result-question {
+  font-family: var(--font-display); font-size: 22px; font-weight: 700;
+  color: var(--color-text); line-height: 1.3; margin-bottom: 28px;
+  flex-shrink: 0;
+}
+
+/* Radio options */
+.radio-group { display: flex; flex-direction: column; gap: 0; flex-shrink: 0; }
+.radio-option {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 4px; cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+  -webkit-tap-highlight-color: transparent;
+  transition: background .1s;
+}
+.radio-option:first-child { border-top: 1px solid var(--color-border); }
+.radio-ring {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--color-border);
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: border-color .2s;
+}
+.radio-ring::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--color-primary); opacity: 0;
+  transition: opacity .2s;
+}
+.radio-option.selected .radio-ring { border-color: var(--color-primary); }
+.radio-option.selected .radio-ring::after { opacity: 1; }
+.radio-label {
+  font-size: 16px; font-family: var(--font-body); color: var(--color-text);
+  font-weight: 400;
+}
+
+/* Results footer — Continue disabled until selection made */
+.results-footer {
+  margin-top: auto; padding-top: 20px; flex-shrink: 0;
+}
+.results-footer .btn-primary {
+  transition: opacity .2s;
+}
+.results-footer .btn-primary.disabled {
+  opacity: .4; pointer-events: none;
+}
+
+/* ── Confirmation screen ── */
+.confirm-intro {
+  font-family: var(--font-display); font-size: 21px; font-weight: 700;
+  color: var(--color-text); line-height: 1.3; margin-bottom: 22px; flex-shrink: 0;
+}
+.confirm-results-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden; margin-bottom: 14px; flex-shrink: 0;
+}
+.confirm-result-row {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+.confirm-result-row:last-child { border-bottom: none; }
+.confirm-result-analyte {
+  font-size: 11px; font-weight: 700; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 3px;
+}
+.confirm-result-value {
+  font-size: 16px; font-weight: 600; font-family: var(--font-body);
+  color: var(--color-text);
+}
+.confirm-result-value.positive { color: var(--color-error); }
+.confirm-result-value.negative { color: var(--color-success); }
+
+.edit-results-btn {
+  width: 100%; padding: 13px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: transparent; color: var(--color-primary);
+  font-family: var(--font-body); font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-bottom: 16px; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+.edit-results-btn:active { background: var(--color-primary-lt); }
+
+/* Attestation checkbox row */
+.attest-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 4px 0 20px; flex-shrink: 0; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.attest-box {
+  width: 22px; height: 22px; border-radius: 5px;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0; margin-top: 1px;
+  display: grid; place-items: center;
+  transition: background .2s, border-color .2s;
+}
+.attest-row.checked .attest-box {
+  background: var(--color-primary); border-color: var(--color-primary);
+}
+.attest-row.checked .attest-box::after {
+  content: ''; width: 11px; height: 7px;
+  border-left: 2.5px solid #fff; border-bottom: 2.5px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.attest-label {
+  font-size: 13px; color: var(--color-muted);
+  font-family: var(--font-body); line-height: 1.55;
+}
+
+/* ── Test Record screen ── */
+.test-record-screen { padding-top: 20px !important; }
+.record-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; flex-shrink: 0;
+}
+.record-title {
+  font-family: var(--font-display); font-size: 19px; font-weight: 700;
+  color: var(--color-primary); text-align: center; flex: 1;
+}
+.record-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--color-primary); font-size: 19px; font-weight: 300;
+  padding: 4px; width: 28px;
+}
+/* Indication banner */
+.indication-block {
+  margin-bottom: 16px; flex-shrink: 0;
+}
+.indication-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 3px;
+}
+.indication-value {
+  font-size: 15px; font-weight: 600; font-family: var(--font-body);
+  color: var(--color-text);
+}
+/* Telehealth CTA card */
+.telehealth-card {
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px; flex-shrink: 0;
+}
+.telehealth-card-title {
+  font-family: var(--font-display); font-size: 16px; font-weight: 700;
+  color: #fff; margin-bottom: 5px;
+}
+.telehealth-card-sub {
+  font-size: 12px; color: rgba(255,255,255,.8);
+  font-family: var(--font-body); line-height: 1.55; margin-bottom: 14px;
+}
+.telehealth-btn {
+  width: 100%; padding: 12px;
+  background: #fff; color: var(--color-primary);
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 14px; font-weight: 700;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+/* Kit info block */
+.record-kit-block {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px; margin-bottom: 14px; flex-shrink: 0;
+}
+.record-kit-name {
+  font-size: 14px; font-weight: 600; font-family: var(--font-body);
+  color: var(--color-text); margin-bottom: 3px;
+}
+.record-kit-meta {
+  font-size: 12px; color: var(--color-muted);
+  font-family: var(--font-body); line-height: 1.5;
+}
+/* Test device row */
+.record-device-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 14px; cursor: pointer; flex-shrink: 0;
+}
+.record-device-label { font-size: 14px; font-weight: 600; font-family: var(--font-body); color: var(--color-text); }
+.record-device-sub { font-size: 12px; color: var(--color-muted); font-family: var(--font-body); }
+.record-device-chevron svg { width: 18px; height: 18px; stroke: var(--color-muted); fill: none; stroke-width: 2; }
+/* Results section */
+.record-results-block {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden; margin-bottom: 16px; flex-shrink: 0;
+}
+.record-result-row {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+.record-result-row:last-child { border-bottom: none; }
+.record-result-analyte {
+  font-size: 11px; font-weight: 700; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 2px;
+}
+.record-result-value {
+  font-size: 15px; font-weight: 600; font-family: var(--font-body); color: var(--color-text);
+}
+.record-result-value.positive { color: var(--color-error); }
+.record-result-value.negative { color: var(--color-success); }
+/* Download row */
+.download-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px; cursor: pointer; flex-shrink: 0;
+}
+.download-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--color-primary-lt); display: grid; place-items: center; flex-shrink: 0; }
+.download-icon svg { width: 16px; height: 16px; stroke: var(--color-primary); fill: none; stroke-width: 2.2; }
+.download-label { font-size: 14px; font-weight: 600; font-family: var(--font-body); color: var(--color-text); }
+.download-chevron { margin-left: auto; }
+.download-chevron svg { width: 18px; height: 18px; stroke: var(--color-muted); fill: none; stroke-width: 2; }
+
+/* Abbott dark overrides for results */
+[data-skin="abbott"] .confirm-results-card,
+[data-skin="abbott"] .record-kit-block,
+[data-skin="abbott"] .record-device-row,
+[data-skin="abbott"] .record-results-block,
+[data-skin="abbott"] .download-row { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .confirm-result-row,
+[data-skin="abbott"] .record-result-row,
+[data-skin="abbott"] .record-device-row { border-color: rgba(255,255,255,.07); }
+[data-skin="abbott"] .confirm-result-value,
+[data-skin="abbott"] .record-result-value,
+[data-skin="abbott"] .record-kit-name,
+[data-skin="abbott"] .record-device-label,
+[data-skin="abbott"] .download-label { color: #fff; font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .result-question { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-style: italic; }
+[data-skin="abbott"] .confirm-intro { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-style: italic; }
+[data-skin="abbott"] .radio-label { color: rgba(255,255,255,.85); font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .radio-option { border-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .radio-option:first-child { border-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .edit-results-btn { font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-size: 17px; }
+[data-skin="abbott"] .attest-label { font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .record-title { font-family: 'Barlow Condensed', sans-serif; font-style: italic; }
+[data-skin="abbott"] .indication-value { font-family: 'Barlow', sans-serif; color: rgba(255,255,255,.85); }
+[data-skin="abbott"] .record-kit-meta { font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .record-device-sub { font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .telehealth-card { background: rgba(245,197,18,.12); border: 1px solid rgba(245,197,18,.25); }
+[data-skin="abbott"] .telehealth-card-title { color: var(--color-primary); }
+[data-skin="abbott"] .telehealth-card-sub { color: rgba(255,255,255,.6); }
+[data-skin="abbott"] .telehealth-btn { background: var(--color-primary); color: #13165C; }
+[data-skin="abbott"] .download-icon { background: rgba(245,197,18,.12); }
+[data-skin="bd"] .result-question { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .3px; }
+[data-skin="bd"] .confirm-intro { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 19px; }
+[data-skin="bd"] .radio-label { font-family: 'Barlow', sans-serif; }
+[data-skin="bd"] .confirm-result-value,
+[data-skin="bd"] .record-result-value { font-family: 'Barlow', sans-serif; }
+[data-skin="bd"] .record-title { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 16px; }
+[data-skin="bd"] .edit-results-btn { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; }
+[data-skin="quidel"] .result-question { font-family: 'Outfit', sans-serif; }
+[data-skin="quidel"] .confirm-intro { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .result-question { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .confirm-intro { font-family: 'Outfit', sans-serif; }
+
+
+.support-screen { }
+
+.support-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.support-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--color-primary); font-size: 20px; line-height: 1;
+  padding: 4px; -webkit-tap-highlight-color: transparent;
+  font-weight: 300; width: 32px;
+}
+.support-title {
+  font-family: var(--font-display); font-size: 19px; font-weight: 700;
+  color: var(--color-primary); text-align: center; flex: 1;
+  letter-spacing: -.2px;
+}
+
+/* Purpose select — styled to match input aesthetic */
+.support-purpose {
+  width: 100%;
+  padding: 16px 44px 16px 16px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: 15px;
+  color: var(--color-text);
+  -webkit-appearance: none;
+  outline: none; cursor: pointer;
+  margin-bottom: 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.support-purpose:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent); }
+.support-purpose-wrap { position: relative; }
+.support-purpose-wrap::after {
+  content: '';
+  position: absolute; right: 16px; top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--color-muted);
+  pointer-events: none;
+}
+
+/* Message textarea */
+.support-message {
+  width: 100%; min-height: 160px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: 15px;
+  color: var(--color-text); resize: none; outline: none;
+  line-height: 1.6;
+  transition: border-color .2s, box-shadow .2s;
+  margin-bottom: 20px;
+}
+.support-message:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent); }
+.support-message::placeholder { color: var(--color-border); }
+
+/* Send button state — gray until both fields filled */
+.support-send-note {
+  font-size: 12px; color: var(--color-muted);
+  font-family: var(--font-body); text-align: center; margin-top: -10px;
+}
+
+/* Success state */
+.support-sent-state {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; flex: 1; gap: 12px;
+}
+.support-sent-state.visible { display: flex; }
+.support-sent-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--color-primary-lt);
+  display: grid; place-items: center; margin-bottom: 4px;
+}
+.support-sent-icon svg { width: 28px; height: 28px; stroke: var(--color-primary); fill: none; stroke-width: 2.4; }
+.support-sent-title {
+  font-family: var(--font-display); font-size: 22px; font-weight: 700;
+  color: var(--color-text);
+}
+.support-sent-sub {
+  font-size: 14px; color: var(--color-muted); font-family: var(--font-body);
+  max-width: 240px; line-height: 1.6;
+}
+
+/* Abbott dark overrides */
+[data-skin="abbott"] .support-purpose,
+[data-skin="abbott"] .support-message {
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.12);
+  color: #fff; font-family: 'Barlow', sans-serif;
+}
+[data-skin="abbott"] .support-purpose::placeholder,
+[data-skin="abbott"] .support-message::placeholder { color: rgba(255,255,255,.25); }
+[data-skin="abbott"] .support-purpose:focus,
+[data-skin="abbott"] .support-message:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(245,197,18,.18); }
+[data-skin="abbott"] .support-title { font-family: 'Barlow Condensed', sans-serif; font-style: italic; }
+[data-skin="abbott"] .support-purpose-wrap::after { border-top-color: rgba(255,255,255,.3); }
+[data-skin="bd"] .support-title { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-style: normal; font-size: 17px; }
+[data-skin="bd"] .support-purpose, [data-skin="bd"] .support-message { font-family: 'Barlow', sans-serif; border-radius: 0; border-bottom-width: 2px; border-top: none; border-left: none; border-right: none; background: transparent; }
+[data-skin="quidel"] .support-title { font-family: 'Outfit', sans-serif; }
+[data-skin="quidel"] .support-purpose, [data-skin="quidel"] .support-message { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .support-title { font-family: 'Outfit', sans-serif; }
+[data-skin="ihealth"] .support-purpose, [data-skin="ihealth"] .support-message { font-family: 'Outfit', sans-serif; border: none; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+[data-skin="ihealth"] .support-purpose:focus, [data-skin="ihealth"] .support-message:focus { box-shadow: 0 0 0 3.5px rgba(0,111,230,.22); }
+
+
+/* ══════════════════════════════════════════════════
+   TEST HISTORY SCREEN
+══════════════════════════════════════════════════ */
+.history-screen { }
+.tab-screen-title {
+  font-family: var(--font-display); font-size: 24px; font-weight: 700;
+  color: var(--color-text); margin-bottom: 20px; flex-shrink: 0;
+}
+[data-skin="abbott"] .tab-screen-title { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-size: 28px; }
+[data-skin="bd"] .tab-screen-title { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .5px; }
+
+.history-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; text-align: center; opacity: .5;
+}
+.history-empty svg { width: 48px; height: 48px; stroke: var(--color-muted); fill: none; stroke-width: 1.4; }
+.history-empty-label { font-size: 15px; color: var(--color-muted); font-family: var(--font-body); }
+
+.history-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.history-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: box-shadow .15s;
+  display: flex; align-items: center; gap: 14px;
+}
+.history-card:active { box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+.history-card-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
+  background: var(--color-primary-lt); display: grid; place-items: center; flex-shrink: 0;
+}
+.history-card-icon svg { width: 20px; height: 20px; stroke: var(--color-primary); fill: none; stroke-width: 2; }
+.history-card-body { flex: 1; min-width: 0; }
+.history-card-name { font-size: 13px; font-weight: 600; font-family: var(--font-body); color: var(--color-text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-card-date { font-size: 12px; color: var(--color-muted); font-family: var(--font-body); }
+.history-card-badges { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+.history-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: .3px;
+  padding: 2px 8px; border-radius: 999px;
+  font-family: var(--font-body);
+}
+.history-badge.positive { background: rgba(220,38,38,.1); color: var(--color-error); }
+.history-badge.negative { background: rgba(22,163,74,.1); color: var(--color-success); }
+.history-card-chevron svg { width: 18px; height: 18px; stroke: var(--color-muted); fill: none; stroke-width: 2; }
+
+[data-skin="abbott"] .history-card { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .history-card-name { color: #fff; font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .history-card-icon { background: rgba(245,197,18,.1); }
+[data-skin="abbott"] .history-badge.positive { background: rgba(255,80,80,.12); }
+[data-skin="abbott"] .history-badge.negative { background: rgba(0,184,226,.1); color: var(--color-accent); }
+
+/* ══════════════════════════════════════════════════
+   ACCOUNT SCREEN
+══════════════════════════════════════════════════ */
+.account-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--color-primary); display: grid; place-items: center;
+  margin: 0 auto 12px; flex-shrink: 0;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+.account-avatar svg { width: 36px; height: 36px; stroke: #fff; fill: none; stroke-width: 1.8; }
+.account-name-display { text-align: center; font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--color-text); margin-bottom: 4px; }
+.account-email-display { text-align: center; font-size: 13px; color: var(--color-muted); font-family: var(--font-body); margin-bottom: 24px; }
+[data-skin="abbott"] .account-name-display { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-size: 24px; }
+[data-skin="bd"] .account-name-display { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+
+.acct-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--color-muted);
+  font-family: var(--font-body); margin-bottom: 8px; margin-top: 20px; flex-shrink: 0;
+}
+.acct-section-label:first-of-type { margin-top: 0; }
+.acct-group {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden; margin-bottom: 6px; flex-shrink: 0;
+}
+.acct-field {
+  display: flex; align-items: center;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 12px;
+}
+.acct-field:last-child { border-bottom: none; }
+.acct-field-label { font-size: 12px; font-weight: 600; color: var(--color-muted); font-family: var(--font-body); width: 90px; flex-shrink: 0; }
+.acct-field-value { flex: 1; font-size: 14px; font-family: var(--font-body); color: var(--color-text); font-weight: 400; }
+.acct-field-input {
+  flex: 1; font-size: 14px; font-family: var(--font-body); color: var(--color-text);
+  border: none; background: transparent; outline: none; padding: 0;
+  -webkit-appearance: none;
+}
+.acct-field-input::placeholder { color: var(--color-border); }
+.acct-edit-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--color-primary); font-size: 13px; font-family: var(--font-body);
+  font-weight: 600; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+}
+.acct-chevron svg { width: 16px; height: 16px; stroke: var(--color-muted); fill: none; stroke-width: 2; }
+
+[data-skin="abbott"] .acct-group { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.1); }
+[data-skin="abbott"] .acct-field { border-color: rgba(255,255,255,.07); }
+[data-skin="abbott"] .acct-field-value,
+[data-skin="abbott"] .acct-field-input { color: rgba(255,255,255,.85); font-family: 'Barlow', sans-serif; }
+[data-skin="abbott"] .acct-field-input { -webkit-text-fill-color: rgba(255,255,255,.85); }
+[data-skin="bd"] .acct-field-value,
+[data-skin="bd"] .acct-field-input { font-family: 'Barlow', sans-serif; }
+
+.acct-save-btn {
+  width: 100%; margin-top: 20px; flex-shrink: 0;
+  display: none;
+}
+.acct-save-btn.visible { display: block; }
+
+.acct-danger-btn {
+  width: 100%; padding: 13px; margin-top: 8px;
+  border: 1.5px solid var(--color-error); color: var(--color-error);
+  background: transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+  transition: background .15s;
+}
+.acct-danger-btn:active { background: rgba(220,38,38,.06); }
+
+</style>
+</head>
+
+<body data-skin="default">
+
+<!-- VERTICAL TRACK PANEL (desktop only) -->
+<!-- PAGE WRAP — phone frame on desktop -->
+<div class="page-wrap">
+
+<!-- SKIN SWITCHER BAR -->
+<div class="skin-bar">
+  <button class="skin-btn active" data-skin="default" onclick="setSkin('default')">Default</button>
+  <button class="skin-btn"        data-skin="bd"      onclick="setSkin('bd')">BD</button>
+  <button class="skin-btn"        data-skin="quidel"  onclick="setSkin('quidel')">Quidel</button>
+  <button class="skin-btn"        data-skin="abbott"  onclick="setSkin('abbott')">BinaxNOW</button>
+  <button class="skin-btn"        data-skin="ihealth" onclick="setSkin('ihealth')">iHealth</button>
+</div>
+
+<!-- NAV SLIDER -->
+<div class="nav-slider-bar">
+  <div class="slider-sections-above" id="sliderSectionsAbove"></div>
+  <input type="range" id="navSlider" min="0" value="0"
+         oninput="onSliderInput(this.value)"/>
+  <div class="slider-screen-below" id="sliderScreenBelow">Welcome</div>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+<div class="screens" id="sc">
+
+  <!-- ══ WELCOME ══ -->
+  <div class="screen active" id="s-welcome">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <div class="welcome-hero">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"/><path d="M12 8v8M8 12h8"/></svg>
+      </div>
+      <div class="hero-badge">COVID · FLU A · FLU B</div>
+      <h1 class="hero-title hero-title-default">Results you can <em>trust</em>, fast.</h1>
+      <h1 class="hero-title hero-title-ihealth" style="display:none">COVID-19<br>Flu A&amp;B<br><em>3-in-1</em></h1>
+      <h1 class="hero-title hero-title-abbott" style="display:none">Binax<em>NOW</em></h1>
+      <span class="ihealth-rapid-label">Rapid Self-Test · Results In 15 Mins</span>
+      <span class="abbott-made-usa" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;margin-top:-8px;">Made in the USA · Ages 2 and up</span>
+      <p class="hero-sub">Guided at-home testing with professional-grade accuracy.</p>
+      <div class="hero-chips">
+        <span class="chip">✦ 15-min results</span>
+        <span class="chip">✦ FDA authorized</span>
+        <span class="chip">✦ Secure &amp; private</span>
+      </div>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn btn-primary" onclick="go('s-signup')">Create Account</button>
+      <button class="btn btn-outline" onclick="go('s-login')">Sign In</button>
+    </div>
+  </div>
+
+  <!-- ══ SIGN IN ══ -->
+  <div class="screen" id="s-login">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <div class="brand-mark">
+      <div class="brand-icon" style="width:40px;height:40px">
+        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"/><path d="M12 8v8M8 12h8"/></svg>
+      </div>
+      <span class="brand-name" id="brand-label">ClearTest</span>
+    </div>
+    <div class="gap-md"></div>
+    <h2 class="screen-title">Welcome back</h2>
+    <p class="screen-sub">Sign in to access your test results and history.</p>
+    <div class="field"><label>Email address</label><input class="input" type="email" placeholder="you@example.com" inputmode="email" autocomplete="email"/></div>
+    <div class="field">
+      <label>Password</label>
+      <input class="input" type="password" placeholder="••••••••" id="pw-login" style="padding-right:48px" autocomplete="current-password"/>
+      <span class="input-icon" onclick="togglePW('pw-login',this)"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
+    </div>
+    <div class="link-right"><button onclick="go('s-forgot')">Forgot password?</button></div>
+    <button class="btn btn-primary" onclick="go('s-dashboard')">Sign In</button>
+    <div class="auth-footer">Don't have an account? <button onclick="go('s-signup')">Sign up</button></div>
+  </div>
+
+  <!-- ══ SIGN UP ══ -->
+  <div class="screen" id="s-signup">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <button class="back-btn" onclick="go('s-welcome')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <h2 class="screen-title">Create account</h2>
+    <p class="screen-sub">Get started — it only takes a minute.</p>
+    <div class="row">
+      <div class="field"><label>First name</label><input class="input" type="text" placeholder="Jane" autocomplete="given-name"/></div>
+      <div class="field"><label>Last name</label><input class="input" type="text" placeholder="Doe" autocomplete="family-name"/></div>
+    </div>
+    <div class="field"><label>Email address</label><input class="input" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+    <p class="consent">By creating an account you agree to receive important communications about your test results. Manage preferences anytime in Settings.</p>
+    <button class="btn btn-primary" onclick="go('s-otp-email')">Send Verification Code</button>
+    <div class="auth-footer">Already have an account? <button onclick="go('s-login')">Sign in</button></div>
+  </div>
+
+  <!-- ══ VERIFY EMAIL ══ -->
+  <div class="screen" id="s-otp-email">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <button class="back-btn" onclick="go('s-signup')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <div class="gap-md"></div>
+    <h2 class="screen-title">Check your email</h2>
+    <p class="screen-sub">We sent a 6-digit code to <strong>j***@example.com</strong>. It expires in 10 minutes.</p>
+    <div class="otp-row" id="otp-e">
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+    </div>
+    <button class="btn btn-primary" id="btn-e" onclick="go('s-create-pw')" style="display:none">Continue</button>
+    <div class="spacer"></div>
+    <div class="auth-footer">Didn't get it? <button onclick="resendCode('cnt-e')">Resend code</button> <span id="cnt-e" style="font-size:12px"></span></div>
+  </div>
+
+  <!-- ══ CREATE PASSWORD ══ -->
+  <div class="screen" id="s-create-pw">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <button class="back-btn" onclick="go('s-otp-email')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <div class="progress-dots"><div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="gap-sm"></div>
+    <h2 class="screen-title">Create a password</h2>
+    <p class="screen-sub">Choose a strong password to keep your health data secure.</p>
+    <div class="field">
+      <label>Password</label>
+      <input class="input" type="password" placeholder="••••••••" id="pw-new" oninput="checkPW(this)" style="padding-right:48px" autocomplete="new-password"/>
+      <span class="input-icon" onclick="togglePW('pw-new',this)"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
+    </div>
+    <div class="field">
+      <label>Confirm password</label>
+      <input class="input" type="password" placeholder="••••••••" id="pw-confirm" style="padding-right:48px" autocomplete="new-password"/>
+      <span class="input-icon" onclick="togglePW('pw-confirm',this)"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
+    </div>
+    <div class="pw-reqs">
+      <div class="req" id="req-len"><span class="req-dot"></span>8+ characters</div>
+      <div class="req" id="req-upper"><span class="req-dot"></span>Uppercase letter</div>
+      <div class="req" id="req-lower"><span class="req-dot"></span>Lowercase letter</div>
+      <div class="req" id="req-num"><span class="req-dot"></span>Number</div>
+      <div class="req" id="req-special"><span class="req-dot"></span>Special character</div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Enable Face ID / Touch ID</div><div class="toggle-sub">Sign in faster next time</div></div>
+      <label class="toggle"><input type="checkbox"/><span class="toggle-track"></span></label>
+    </div>
+    <div class="check-row" id="terms-row" onclick="this.classList.toggle('checked')">
+      <span class="check-box"></span>
+      <label>I agree to the <a href="#">Terms &amp; Conditions</a> and confirm I am a legal adult.</label>
+    </div>
+    <div class="gap-md"></div>
+    <button class="btn btn-primary" onclick="go('s-otp-phone')">Continue</button>
+  </div>
+
+  <!-- ══ VERIFY PHONE ══ -->
+  <div class="screen" id="s-otp-phone">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <button class="back-btn" onclick="go('s-create-pw')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <div class="progress-dots"><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot"></div></div>
+    <div class="gap-sm"></div>
+    <h2 class="screen-title">Verify your phone</h2>
+    <p class="screen-sub">We sent a 6-digit code to <strong>(•••) •••-••••</strong>. Enter it below.</p>
+    <div class="otp-row" id="otp-p">
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+    </div>
+    <button class="btn btn-primary" id="btn-p" onclick="go('s-profile')" style="display:none">Continue</button>
+    <div class="spacer"></div>
+    <div class="auth-footer">Didn't receive it? <button onclick="resendCode('cnt-p')">Resend code</button> <span id="cnt-p" style="font-size:12px"></span></div>
+  </div>
+
+  <!-- ══ PROFILE ══ -->
+  <div class="screen" id="s-profile">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <button class="back-btn" onclick="go('s-otp-phone')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <div class="progress-dots"><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div></div>
+    <div class="gap-sm"></div>
+    <h2 class="screen-title">A little about you</h2>
+    <p class="screen-sub">This helps us personalize your testing experience and ensure accurate results.</p>
+    <div class="field">
+      <label>Date of birth</label>
+      <div class="date-row">
+        <div class="select-wrapper">
+          <select><option value="">Month</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select>
+        </div>
+        <div class="select-wrapper">
+          <select><option value="">Day</option><script>for(let i=1;i<=31;i++)document.write(`<option>${i}</option>`);</script></select>
+        </div>
+        <div class="select-wrapper">
+          <select><option value="">Year</option><script>for(let y=new Date().getFullYear()-13;y>=1924;y--)document.write(`<option>${y}</option>`);</script></select>
+        </div>
+      </div>
+    </div>
+    <div class="field" style="margin-top:4px">
+      <label>Sex at birth</label>
+      <div class="select-wrapper">
+        <select><option value="">Select…</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select>
+      </div>
+    </div>
+    <p class="consent" style="margin-top:12px">This information is used solely to improve your test results and comply with health reporting requirements. Protected under our <a href="#" style="color:var(--color-primary)">Privacy Policy</a>.</p>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" onclick="go('s-done')">Finish Setup</button>
+  </div>
+
+  <!-- ══ DONE ══ -->
+  <div class="screen" id="s-done" style="align-items:center;justify-content:center;text-align:center">
+    <div class="brand-icon" style="width:68px;height:68px;margin-bottom:18px">
+      <svg viewBox="0 0 24 24" style="width:32px;height:32px"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 class="screen-title">You're all set!</h2>
+    <p class="screen-sub" style="max-width:230px;margin:8px auto 28px">Your account is ready. Start your first test whenever you're ready.</p>
+    <button class="btn btn-primary" style="max-width:230px" onclick="go('s-dashboard')">Go to Dashboard</button>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="screen has-tabs" id="s-dashboard" style="padding:0;display:flex;flex-direction:column">
+    <div style="flex:1;overflow-y:auto;padding:44px 28px 0">
+    <div class="dash-header">
+      <div>
+        <div class="dash-date" id="dash-date-label">Today</div>
+        <div class="dash-greeting">Hello, <span id="dash-name">Jane</span></div>
+      </div>
+      <div class="dash-bell">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+    </div>
+
+    <!-- Hero photo card -->
+    <div class="hero-photo-card">
+      <div class="hero-bg-grad" id="heroGrad"></div>
+      <div class="hero-tagline">
+        <div class="hero-tagline-sub">At-Home Test</div>
+        <div class="hero-tagline-title">Know in<br>15 minutes.</div>
+      </div>
+      <div class="hero-scene">
+        <svg class="hero-person" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="80" cy="200" rx="60" ry="50" fill="rgba(255,255,255,.12)"/>
+          <rect x="38" y="110" width="84" height="75" rx="16" fill="rgba(255,255,255,.15)"/>
+          <rect x="88" y="118" width="32" height="52" rx="6" fill="rgba(255,255,255,.35)"/>
+          <rect x="91" y="122" width="26" height="40" rx="3" fill="rgba(255,255,255,.2)"/>
+          <rect x="92" y="123" width="24" height="38" rx="2" fill="rgba(100,180,255,.3)"/>
+          <ellipse cx="80" cy="78" rx="30" ry="33" fill="rgba(255,200,150,.9)"/>
+          <path d="M50 72 C50 45 110 45 110 72 L108 58 C105 35 55 35 52 58 Z" fill="rgba(60,40,20,.8)"/>
+          <ellipse cx="80" cy="50" rx="31" ry="20" fill="rgba(60,40,20,.8)"/>
+          <ellipse cx="70" cy="80" rx="4" ry="5" fill="rgba(255,220,170,.8)"/>
+          <ellipse cx="90" cy="80" rx="4" ry="5" fill="rgba(255,220,170,.8)"/>
+          <path d="M73 92 Q80 98 87 92" stroke="rgba(180,100,80,.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Take a Test card -->
+    <div class="test-card">
+      <div class="test-card-label">Ready when you are</div>
+      <div class="test-card-title">Take a Test</div>
+      <div class="test-card-sub">Begin the self-administered test process and see if you are eligible for telehealth services (18+ only, service fees apply).</div>
+      <button class="btn btn-primary" onclick="go('s-scan-intro')">Go to Test</button>
+    </div>
+    </div><!-- /scroll wrapper -->
+    <div class="tab-bar">
+      <button class="tab-item active" id="tab-home-dash" onclick="setTab('s-dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="tab-item" id="tab-hist-dash" onclick="setTab('s-history')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Test History
+      </button>
+      <button class="tab-item" id="tab-info-dash" onclick="setTab('s-info')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="3"/></svg>
+        Info
+      </button>
+      <button class="tab-item" id="tab-acct-dash" onclick="setTab('s-account')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Account
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCAN INTRO ══ -->
+  <div class="screen scan-intro-screen" id="s-scan-intro">
+    <!-- Simulated camera -->
+    <div class="camera-preview"></div>
+
+    <!-- Barcode lines drawn in CSS on the simulated box -->
+    <div class="barcode-lines">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- Orange scan highlight -->
+    <div class="barcode-highlight"></div>
+
+    <!-- Close button -->
+    <button class="camera-close" onclick="go('s-dashboard')">&times;</button>
+
+    <!-- Bottom sheet -->
+    <div class="scan-sheet">
+      <div class="scan-sheet-title">Scan the barcode</div>
+      <div class="scan-sheet-sub">Hold your phone over the barcode on the box. Make sure the barcode fits inside the frame.</div>
+      <button class="btn btn-primary" onclick="go('s-scanner')">Scan Code</button>
+    </div>
+  </div>
+
+  <!-- ══ ACTIVE SCANNER ══ -->
+  <div class="screen active-scanner-screen" id="s-scanner">
+    <div class="scanner-camera"></div>
+
+    <!-- Scanner nav -->
+    <div class="scanner-nav">
+      <button class="back-btn" style="color:#fff;margin:0" onclick="go('s-scan-intro')">
+        <svg viewBox="0 0 24 24" style="stroke:#fff"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="scanner-nav-title">Scan Code</div>
+      <div style="width:38px"></div>
+    </div>
+
+    <!-- Viewfinder -->
+    <div class="viewfinder">
+      <div class="vf-corner tl"></div>
+      <div class="vf-corner tr"></div>
+      <div class="vf-corner bl"></div>
+      <div class="vf-corner br"></div>
+      <div class="scan-line"></div>
+    </div>
+
+    <!-- Dark side masks -->
+    <div class="scanner-side-mask left"></div>
+    <div class="scanner-side-mask right"></div>
+
+    <!-- Bottom hint — tap to trigger success -->
+    <div class="scanner-bottom">
+      <div class="scanner-hint" onclick="go('s-kit-contents')" style="cursor:pointer">
+        Hold camera over the code
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ KIT CONTENTS ══ -->
+  <div class="screen kit-screen has-tabs" id="s-kit-contents" style="padding:0;display:flex;flex-direction:column">
+    <div style="flex:1;overflow-y:auto;padding:28px 28px 16px">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+
+    <button class="back-btn" onclick="go('s-scanner')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+
+    <!-- Kit box illustration -->
+    <div class="kit-image-area">
+      <div id="kitBgArea" style="position:absolute;inset:0;border-radius:inherit;"></div>
+      <div class="kit-box-illustration">
+        <div class="kit-box-body">
+          <div class="kit-box-left">
+            <div class="kit-brand-text" id="kitBrandBox">iHealth®</div>
+            <div style="font-size:10px;color:#666;line-height:1.3;font-family:var(--font-body)">Rapid Self-Test<br>Results In 15 Mins</div>
+          </div>
+          <div class="kit-box-right" id="kitBoxRight">
+            <div class="kit-box-title-text" id="kitBoxTitle">COVID-19<br>Flu A&B<br>3-in-1</div>
+            <div class="kit-box-subtitle-text">12 TESTS</div>
+          </div>
+          <div class="kit-box-count">2 Tests</div>
+        </div>
+        <div class="kit-box-swab"></div>
+      </div>
+    </div>
+
+    <div class="kit-eyebrow">TEST KIT</div>
+    <div class="kit-name" id="kitName">COVID-19 + Flu A&amp;B 3-in-1 Self-Test (2 Test/Box)</div>
+    <div class="kit-brand" id="kitBrandName">iHealth Labs, Inc.</div>
+    <div class="kit-divider"></div>
+
+    <div class="kit-contents-label">What's in the box</div>
+
+    <div class="kit-item"><div class="kit-item-dot"></div><div class="kit-item-name">Sterile Nasal Swab</div><div class="kit-item-qty">×2</div></div>
+    <div class="kit-item"><div class="kit-item-dot"></div><div class="kit-item-name">Test Tube with Buffer Solution</div><div class="kit-item-qty">×2</div></div>
+    <div class="kit-item"><div class="kit-item-dot"></div><div class="kit-item-name">Test Device</div><div class="kit-item-qty">×2</div></div>
+    <div class="kit-item"><div class="kit-item-dot"></div><div class="kit-item-name">Tube Holder</div><div class="kit-item-qty">×1</div></div>
+    <div class="kit-item"><div class="kit-item-dot"></div><div class="kit-item-name">Quick Reference Instructions</div><div class="kit-item-qty">×1</div></div>
+
+    <div class="spacer"></div>
+    <button class="btn btn-primary" style="margin-top:20px" onclick="go('s-instructions')">Begin Instructions</button>
+    </div><!-- /scroll wrapper -->
+    <div class="tab-bar">
+      <button class="tab-item" onclick="setTab('s-dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="tab-item" onclick="setTab('s-history')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Test History
+      </button>
+      <button class="tab-item" onclick="setTab('s-info')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="3"/></svg>
+        Info
+      </button>
+      <button class="tab-item" onclick="setTab('s-account')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Account
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ INSTRUCTIONS ══ -->
+  <div class="screen instr-screen" id="s-instructions">
+
+    <!-- Sticky header -->
+    <div class="instr-header">
+      <div class="instr-title-row">
+        <div style="width:32px"></div>
+        <div class="instr-title">Instructions</div>
+        <button class="instr-close" onclick="go('s-kit-contents')">✕</button>
+      </div>
+      <div class="instr-progress-track">
+        <div class="instr-progress-fill" id="instrProgress" style="width:32%"></div>
+      </div>
+    </div>
+
+
+    <div class="instr-body">
+      <p class="instr-refer-note">Please refer to the paper instructions included in your kit for complete reference information.</p>
+
+      <!-- Video player mockup -->
+      <div class="video-player">
+        <div class="video-thumb">
+          <!-- Toolbar -->
+          <div class="video-toolbar">
+            <button class="video-toolbar-btn">
+              <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+            <button class="video-toolbar-btn">
+              <svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+            </button>
+            <div style="flex:1"></div>
+            <button class="video-toolbar-btn">
+              <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+          </div>
+
+          <!-- Play button centered -->
+          <div class="video-play-btn" onclick="this.querySelector('svg').style.display=this.querySelector('svg').style.display==='none'?'block':'none'">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="var(--color-primary)"/></svg>
+          </div>
+        </div>
+
+        <!-- Controls bar -->
+        <div class="video-controls">
+          <span class="video-time">0:49</span>
+          <div class="video-scrub">
+            <div class="video-scrub-fill"></div>
+            <div class="video-scrub-dot"></div>
+          </div>
+          <span class="video-time">-2:30</span>
+          <span class="video-more">···</span>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="instr-footer">
+      <button class="contact-support-link" onclick="go('s-support')">Contact Support</button>
+      <button class="btn btn-primary" style="width:100%" onclick="go('s-capture-intro')">Continue</button>
+    </div>
+
+  </div>
+
+  <!-- ══ CAPTURE INTRO ══ -->
+  <div class="screen capture-intro-screen" id="s-capture-intro">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+
+    <div class="capture-nav">
+      <button class="back-btn" style="margin:0" onclick="go('s-instructions')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="capture-nav-title">Capture Test</div>
+      <button class="capture-nav-close" onclick="go('s-instructions')">✕</button>
+    </div>
+
+    <div class="capture-section-title">Capture Photo</div>
+    <p class="capture-instructions">Lay your test cassette on a flat surface. Align the entire test cassette within the guidelines and take the photo. Ensure there is proper lighting with no shadows or glares. See example image below.</p>
+
+    <!-- Example photo mockup -->
+    <div class="capture-example">
+      <div class="example-cassette">
+        <div class="cassette-top-window"></div>
+        <div class="cassette-result-window">
+          <div class="cassette-line-c"></div>
+        </div>
+      </div>
+      <div class="example-label">Example — place cassette flat</div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn btn-primary" onclick="go('s-capture-camera')">Capture Test</button>
+  </div>
+
+  <!-- ══ CAPTURE CAMERA ══ -->
+  <div class="screen capture-camera-screen" id="s-capture-camera">
+    <!-- Paper surface background -->
+    <div class="capture-cam-bg"></div>
+
+    <!-- Branded frame overlay -->
+    <div class="capture-overlay-frame"></div>
+
+    <!-- Nav -->
+    <div class="capture-cam-nav">
+      <button class="back-btn" style="color:#fff;margin:0" onclick="go('s-capture-intro')">
+        <svg viewBox="0 0 24 24" style="stroke:#fff"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+
+    <!-- Shutter -->
+    <div class="capture-shutter-area">
+      <div class="capture-hint-pill">Hold camera over the test</div>
+      <div class="shutter-btn" onclick="go('s-capture-review')"></div>
+    </div>
+  </div>
+
+  <!-- ══ PHOTO REVIEW ══ -->
+  <div class="screen capture-review-screen" id="s-capture-review">
+    <div class="review-backdrop"></div>
+
+    <button class="review-back-btn" onclick="go('s-capture-camera')">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="review-card">
+      <!-- Simulated captured photo -->
+      <div class="review-photo">
+        <div class="review-cassette">
+          <div class="cassette-top-window"></div>
+          <div class="cassette-result-window">
+            <div class="cassette-line-c"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="review-actions">
+        <button class="btn btn-primary" onclick="startProcessing()">Submit</button>
+        <button class="btn btn-outline" onclick="go('s-capture-camera')">Rescan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROCESSING SPINNER ══ -->
+  <div class="screen processing-screen" id="s-processing">
+    <div class="processing-spinner"></div>
+    <div class="processing-label">Processing Image</div>
+  </div>
+
+  <!-- ══ RESULT: CONTROL LINE ══ -->
+  <div class="screen" id="s-result-control">
+    <div class="bd-accent-bar"></div><div class="quidel-stripe"></div><div class="abbott-stripe"></div><div class="default-header-rule"></div>
+    <div class="results-nav">
+      <button class="results-nav-back" onclick="go('s-capture-review')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="results-nav-kit" id="resultsKitLabel">COVID-19 + Flu A&amp;B Self-Test</div>
+      <button class="results-nav-close" onclick="go('s-dashboard')">✕</button>
+    </div>
+    <div class="result-question">Do you see a control line?</div>
+    <div class="radio-group" id="rg-control">
+      <div class="radio-option" onclick="selectRadio('rg-control',this,'yes-control');enableBtn('btn-control')">
+        <div class="radio-ring"></div><div class="radio-label">Yes, I see a control line</div>
+      </div>
+      <div class="radio-option" onclick="selectRadio('rg-control',this,'no-control');enableBtn('btn-control')">
+        <div class="radio-ring"></div><div class="radio-label">No, I do not see a control line</div>
+      </div>
+    </div>
+    <div class="results-footer">
+      <button class="btn btn-primary disabled" id="btn-control" onclick="go('s-result-covid')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT: COVID-19 ══ -->
+  <div class="screen" id="s-result-covid">
+    <div class="bd-accent-bar"></div><div class="quidel-stripe"></div><div class="abbott-stripe"></div><div class="default-header-rule"></div>
+    <div class="results-nav">
+      <button class="results-nav-back" onclick="go('s-result-control')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="results-nav-kit">COVID-19 + Flu A&amp;B Self-Test</div>
+      <button class="results-nav-close" onclick="go('s-dashboard')">✕</button>
+    </div>
+    <div class="result-question">Please look at your test device, what is your result for COVID-19?</div>
+    <div class="radio-group" id="rg-covid">
+      <div class="radio-option" onclick="selectRadio('rg-covid',this,'positive');setResult('covid','Positive');enableBtn('btn-covid')">
+        <div class="radio-ring"></div><div class="radio-label">Positive</div>
+      </div>
+      <div class="radio-option" onclick="selectRadio('rg-covid',this,'negative');setResult('covid','Negative');enableBtn('btn-covid')">
+        <div class="radio-ring"></div><div class="radio-label">Negative</div>
+      </div>
+    </div>
+    <div class="results-footer">
+      <button class="btn btn-primary disabled" id="btn-covid" onclick="go('s-result-flua')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT: FLU-A ══ -->
+  <div class="screen" id="s-result-flua">
+    <div class="bd-accent-bar"></div><div class="quidel-stripe"></div><div class="abbott-stripe"></div><div class="default-header-rule"></div>
+    <div class="results-nav">
+      <button class="results-nav-back" onclick="go('s-result-covid')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="results-nav-kit">COVID-19 + Flu A&amp;B Self-Test</div>
+      <button class="results-nav-close" onclick="go('s-dashboard')">✕</button>
+    </div>
+    <div class="result-question">Please look at your test device, what is your result for FLU-A?</div>
+    <div class="radio-group" id="rg-flua">
+      <div class="radio-option" onclick="selectRadio('rg-flua',this,'positive');setResult('flua','Positive');enableBtn('btn-flua')">
+        <div class="radio-ring"></div><div class="radio-label">Positive</div>
+      </div>
+      <div class="radio-option" onclick="selectRadio('rg-flua',this,'negative');setResult('flua','Negative');enableBtn('btn-flua')">
+        <div class="radio-ring"></div><div class="radio-label">Negative</div>
+      </div>
+    </div>
+    <div class="results-footer">
+      <button class="btn btn-primary disabled" id="btn-flua" onclick="go('s-result-flub')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT: FLU-B ══ -->
+  <div class="screen" id="s-result-flub">
+    <div class="bd-accent-bar"></div><div class="quidel-stripe"></div><div class="abbott-stripe"></div><div class="default-header-rule"></div>
+    <div class="results-nav">
+      <button class="results-nav-back" onclick="go('s-result-flua')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="results-nav-kit">COVID-19 + Flu A&amp;B Self-Test</div>
+      <button class="results-nav-close" onclick="go('s-dashboard')">✕</button>
+    </div>
+    <div class="result-question">Please look at your test device, what is your result for FLU-B?</div>
+    <div class="radio-group" id="rg-flub">
+      <div class="radio-option" onclick="selectRadio('rg-flub',this,'positive');setResult('flub','Positive');enableBtn('btn-flub')">
+        <div class="radio-ring"></div><div class="radio-label">Positive</div>
+      </div>
+      <div class="radio-option" onclick="selectRadio('rg-flub',this,'negative');setResult('flub','Negative');enableBtn('btn-flub')">
+        <div class="radio-ring"></div><div class="radio-label">Negative</div>
+      </div>
+    </div>
+    <div class="results-footer">
+      <button class="btn btn-primary disabled" id="btn-flub" onclick="go('s-result-confirm')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT: CONFIRM ══ -->
+  <div class="screen" id="s-result-confirm">
+    <div class="bd-accent-bar"></div><div class="quidel-stripe"></div><div class="abbott-stripe"></div><div class="default-header-rule"></div>
+    <div class="results-nav">
+      <button class="results-nav-back" onclick="go('s-result-flub')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="results-nav-kit">COVID-19 + Flu A&amp;B Self-Test</div>
+      <button class="results-nav-close" onclick="go('s-dashboard')">✕</button>
+    </div>
+    <div class="confirm-intro">Please confirm that your results are recorded correctly below.</div>
+
+    <div class="confirm-results-card">
+      <div class="confirm-result-row">
+        <div class="confirm-result-analyte">COVID-19</div>
+        <div class="confirm-result-value" id="conf-covid">—</div>
+      </div>
+      <div class="confirm-result-row">
+        <div class="confirm-result-analyte">FLU-A</div>
+        <div class="confirm-result-value" id="conf-flua">—</div>
+      </div>
+      <div class="confirm-result-row">
+        <div class="confirm-result-analyte">FLU-B</div>
+        <div class="confirm-result-value" id="conf-flub">—</div>
+      </div>
+    </div>
+
+    <button class="edit-results-btn" onclick="go('s-result-covid')">Edit My Results</button>
+
+    <div class="attest-row" id="attest-row" onclick="toggleAttest()">
+      <div class="attest-box"></div>
+      <div class="attest-label">I attest that the results I'm reporting are correct and my own.</div>
+    </div>
+
+    <div class="results-footer">
+      <button class="btn btn-primary disabled" id="btn-confirm" onclick="go('s-test-record')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ══ TEST RECORD ══ -->
+  <div class="screen test-record-screen" id="s-test-record" style="overflow-y:auto">
+    <div class="record-header">
+      <div style="width:28px"></div>
+      <div class="record-title">Test Record</div>
+      <button class="record-close" onclick="go('s-dashboard')">✕</button>
+    </div>
+
+    <!-- Indication -->
+    <div class="indication-block">
+      <div class="indication-label">Indication</div>
+      <div class="indication-value" id="record-indication">—</div>
+    </div>
+
+    <!-- Telehealth CTA -->
+    <div class="telehealth-card">
+      <div class="telehealth-card-title">Connect with a Telehealth Provider for Next Steps</div>
+      <div class="telehealth-card-sub">Share your test results and symptoms with a telehealth provider for next steps and treatment if applicable.</div>
+      <button class="telehealth-btn">Connect with Telehealth</button>
+    </div>
+
+    <!-- Kit info -->
+    <div class="record-kit-block">
+      <div class="record-kit-name" id="record-kit-name">COVID-19 + Flu A&amp;B Self-Test (2 Test/Box)</div>
+      <div class="record-kit-meta" id="record-kit-meta">Diagnostic Co<br><span id="record-date"></span></div>
+    </div>
+
+    <!-- Test device link -->
+    <div class="record-device-row">
+      <div>
+        <div class="record-device-label">Test Device</div>
+        <div class="record-device-sub">View Image Result</div>
+      </div>
+      <div class="record-device-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+
+    <!-- Results -->
+    <div class="record-results-block">
+      <div class="record-result-row">
+        <div class="record-result-analyte">COVID-19</div>
+        <div class="record-result-value" id="rec-covid">—</div>
+      </div>
+      <div class="record-result-row">
+        <div class="record-result-analyte">FLU-A</div>
+        <div class="record-result-value" id="rec-flua">—</div>
+      </div>
+      <div class="record-result-row">
+        <div class="record-result-analyte">FLU-B</div>
+        <div class="record-result-value" id="rec-flub">—</div>
+      </div>
+    </div>
+
+    <!-- Download -->
+    <div class="download-row">
+      <div class="download-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="download-label">Download Test Report</div>
+      <div class="download-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- ══ CONTACT SUPPORT ══ -->
+  <div class="screen support-screen" id="s-support">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+
+    <!-- Header -->
+    <div class="support-header">
+      <button class="support-close" onclick="go('s-instructions')">✕</button>
+      <div class="support-title">Contact Support</div>
+      <div style="width:32px"></div>
+    </div>
+
+    <!-- Form -->
+    <div id="supportForm">
+      <div class="support-purpose-wrap">
+        <select class="support-purpose" id="supportPurpose" onchange="checkSupportReady()">
+          <option value="">Select Purpose</option>
+          <option value="account">Help with my account</option>
+          <option value="navigate">Help with navigating the app</option>
+          <option value="test">Help with my test</option>
+          <option value="results">Help with my test results</option>
+          <option value="telehealth">Help with my telehealth session</option>
+          <option value="technical">Help with a technical issue</option>
+          <option value="other">Help with another topic</option>
+          <option value="delete">Help with deleting my account and data</option>
+          <option value="feedback">Provide feedback</option>
+        </select>
+      </div>
+
+      <textarea class="support-message" id="supportMessage" placeholder="Type Message Here" rows="6" oninput="checkSupportReady()"></textarea>
+
+      <button class="btn btn-primary" id="supportSendBtn" onclick="submitSupport()" style="opacity:.45;pointer-events:none">Send</button>
+    </div>
+
+    <!-- Sent confirmation -->
+    <div class="support-sent-state" id="supportSent">
+      <div class="support-sent-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="support-sent-title">Message sent!</div>
+      <div class="support-sent-sub">Our support team will get back to you within 1 business day.</div>
+      <button class="btn btn-primary" style="margin-top:12px;max-width:200px" onclick="resetSupport();go('s-instructions')">Done</button>
+    </div>
+
+  </div>
+
+  <!-- ══ TEST HISTORY ══ -->
+  <div class="screen has-tabs history-screen" id="s-history" style="padding:0;display:flex;flex-direction:column">
+    <div style="flex:1;overflow-y:auto;padding:44px 28px 16px;display:flex;flex-direction:column">
+    <div class="tab-screen-title">Test History</div>
+    <div class="history-empty" id="history-empty">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <div class="history-empty-label">No tests recorded yet</div>
+    </div>
+    <div class="history-list" id="history-list" style="display:none"></div>
+    </div><!-- /scroll wrapper -->
+    <div class="tab-bar">
+      <button class="tab-item" onclick="setTab('s-dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="tab-item active" onclick="setTab('s-history')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Test History
+      </button>
+      <button class="tab-item" onclick="setTab('s-info')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="3"/></svg>
+        Info
+      </button>
+      <button class="tab-item" onclick="setTab('s-account')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Account
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ ACCOUNT ══ -->
+  <div class="screen has-tabs" id="s-account" style="padding:0;display:flex;flex-direction:column">
+    <div style="flex:1;overflow-y:auto;padding:44px 28px 20px">
+    <div class="tab-screen-title">Account</div>
+
+    <!-- Avatar -->
+    <div class="account-avatar">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
+    <div class="account-name-display">Jane Doe</div>
+    <div class="account-email-display">jane.doe@example.com</div>
+
+    <!-- Personal Info -->
+    <div class="acct-section-label">Personal Information</div>
+    <div class="acct-group">
+      <div class="acct-field">
+        <div class="acct-field-label">First Name</div>
+        <input class="acct-field-input" value="Jane" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">Last Name</div>
+        <input class="acct-field-input" value="Doe" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">Date of Birth</div>
+        <input class="acct-field-input" value="Jan 1, 1990" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">Sex at Birth</div>
+        <input class="acct-field-input" value="Female" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="acct-section-label">Contact</div>
+    <div class="acct-group">
+      <div class="acct-field">
+        <div class="acct-field-label">Email</div>
+        <input class="acct-field-input" value="jane.doe@example.com" type="email" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">Phone</div>
+        <input class="acct-field-input" value="(555) 867-5309" type="tel" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">ZIP Code</div>
+        <input class="acct-field-input" value="90210" inputmode="numeric" onchange="showSave()"/>
+        <div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="acct-section-label">Security</div>
+    <div class="acct-group">
+      <div class="acct-field">
+        <div class="acct-field-label">Password</div>
+        <div class="acct-field-value">••••••••••</div>
+        <button class="acct-edit-btn">Change</button>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">Face ID</div>
+        <div class="acct-field-value" style="flex:1">Enabled</div>
+        <label class="toggle" style="flex-shrink:0"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="acct-section-label">Notifications</div>
+    <div class="acct-group">
+      <div class="acct-field">
+        <div class="acct-field-label">Result Alerts</div>
+        <div class="acct-field-value" style="flex:1">On</div>
+        <label class="toggle" style="flex-shrink:0"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+      </div>
+      <div class="acct-field">
+        <div class="acct-field-label">Reminders</div>
+        <div class="acct-field-value" style="flex:1">Off</div>
+        <label class="toggle" style="flex-shrink:0"><input type="checkbox"/><span class="toggle-track"></span></label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary acct-save-btn" id="acct-save-btn" onclick="saveAccount()">Save Changes</button>
+    <button class="acct-danger-btn" onclick="go('s-support')">Delete Account &amp; Data</button>
+    </div><!-- /scroll wrapper -->
+
+    <div class="tab-bar">
+      <button class="tab-item" onclick="setTab('s-dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="tab-item" onclick="setTab('s-history')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Test History
+      </button>
+      <button class="tab-item" onclick="setTab('s-info')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="3"/></svg>
+        Info
+      </button>
+      <button class="tab-item active" onclick="setTab('s-account')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Account
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ INFO ══ -->
+  <div class="screen has-tabs" id="s-info" style="padding:0;display:flex;flex-direction:column">
+    <div style="flex:1;overflow-y:auto;padding:44px 28px 20px">
+    <div class="tab-screen-title">Info</div>
+    <div class="acct-section-label" style="margin-top:0">About This App</div>
+    <div class="acct-group">
+      <div class="acct-field"><div class="acct-field-label">Company</div><div class="acct-field-value">Diagnostic Co</div></div>
+      <div class="acct-field"><div class="acct-field-label">App Version</div><div class="acct-field-value">2.4.1 (Build 118)</div></div>
+      <div class="acct-field"><div class="acct-field-label">Support</div><button class="acct-edit-btn" onclick="go('s-support')">Contact</button></div>
+    </div>
+    <div class="acct-section-label">Legal</div>
+    <div class="acct-group">
+      <div class="acct-field"><div class="acct-field-value">Privacy Policy</div><div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="acct-field"><div class="acct-field-value">Terms of Service</div><div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="acct-field"><div class="acct-field-value">Regulatory Information</div><div class="acct-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    </div>
+    </div><!-- /scroll wrapper -->
+    <div class="tab-bar">
+      <button class="tab-item" onclick="setTab('s-dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="tab-item" onclick="setTab('s-history')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Test History
+      </button>
+      <button class="tab-item active" onclick="setTab('s-info')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="3"/></svg>
+        Info
+      </button>
+      <button class="tab-item" onclick="setTab('s-account')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Account
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ FORGOT PASSWORD ══ -->
+  <div class="screen" id="s-forgot">
+    <div class="bd-accent-bar"></div>
+    <div class="quidel-stripe"></div>
+    <div class="abbott-stripe"></div>
+    <div class="default-header-rule"></div>
+    <button class="back-btn" onclick="go('s-login')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <div class="gap-md"></div>
+    <h2 class="screen-title">Reset password</h2>
+    <p class="screen-sub">Enter your email and we'll send a reset link.</p>
+    <div class="field"><label>Email address</label><input class="input" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+    <button class="btn btn-primary" onclick="go('s-login')">Send Reset Link</button>
+  </div>
+
+</div><!-- /screens -->
+
+<!-- ERROR MODAL -->
+<div class="modal-overlay" id="errorModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="3"/></svg></div>
+    <h3 class="modal-title">Invalid Code</h3>
+    <p class="modal-body">The code you entered doesn't match. Please double-check your message and try again.</p>
+    <button class="btn btn-primary" onclick="closeModal()">Try Again</button>
+  </div>
+</div>
+
+<div class="nav-indicator"></div>
+</div><!-- /shell -->
+
+<script>
+
+
+
+
+
+const brandNames = {
+  bd:      'BD VeritorPlus',
+  quidel:  'QuickVue Connect',
+  abbott:  'BinaxNOW App',
+  ihealth: 'iHealth Test',
+  default: 'Patient Portal'
+};
+
+const skinHeroGrad = {
+  bd:      'linear-gradient(135deg, #003865 0%, #005599 60%, #009A44 100%)',
+  quidel:  'linear-gradient(135deg, #1B3A6B 0%, #2d5299 55%, #E85D04 100%)',
+  abbott:  'linear-gradient(135deg, #13165C 0%, #3B1572 55%, #1B0060 100%)',
+  ihealth: 'linear-gradient(135deg, #E84511 0%, #f06030 55%, #c23000 100%)',
+  default: 'linear-gradient(135deg, #3d5fa0 0%, #5a7fc4 55%, #3d5fa0 100%)',
+};
+
+const skinKitData = {
+  bd:      { brand: 'BD Diagnostics', name: 'BD Veritor™ COVID-19 + Flu A&B (2 Test/Box)', boxBrand: 'BD', boxTitle: 'COVID-19\nFlu A+B', boxRight: '#003865' },
+  quidel:  { brand: 'Quidel Ortho', name: 'QuickVue® COVID-19 + Flu A&B Self-Test (2 Test/Box)', boxBrand: 'QuickVue', boxTitle: 'COVID-19\nFlu A&B', boxRight: '#E85D04' },
+  abbott:  { brand: 'Abbott Laboratories', name: 'BinaxNOW™ COVID-19 Ag Self Test (2 Test/Box)', boxBrand: 'BinaxNOW', boxTitle: 'COVID-19\nAg Test', boxRight: '#13165C' },
+  ihealth: { brand: 'iHealth Labs, Inc.', name: 'iHealth COVID-19 + Flu A&B 3-in-1 Self-Test (2 Test/Box)', boxBrand: 'iHealth®', boxTitle: 'COVID-19\nFlu A&B\n3-in-1', boxRight: '#E84511' },
+  default: { brand: 'Diagnostic Co', name: 'COVID-19 / Influenza A&B Antigen Self-Test (2 Test/Box)', boxBrand: 'MedTest', boxTitle: 'COVID-19\nFlu A&B', boxRight: '#3d5fa0' },
+};
+
+function setSkin(skin) {
+  document.body.setAttribute('data-skin', skin);
+  document.querySelectorAll('.skin-btn').forEach(b => b.classList.toggle('active', b.dataset.skin === skin));
+  const lbl = document.getElementById('brand-label');
+  if (lbl) lbl.textContent = brandNames[skin] || 'ClearTest';
+
+  // Update hero gradient
+  const heroGrad = document.getElementById('heroGrad');
+  if (heroGrad) heroGrad.style.background = skinHeroGrad[skin] || skinHeroGrad.default;
+
+  // Update kit box
+  const kitData = skinKitData[skin] || skinKitData.default;
+  const kitName = document.getElementById('kitName');
+  const kitBrand = document.getElementById('kitBrandName');
+  const kitBrandBox = document.getElementById('kitBrandBox');
+  const kitBoxTitle = document.getElementById('kitBoxTitle');
+  const kitBoxRight = document.getElementById('kitBoxRight');
+  const kitBgArea = document.getElementById('kitBgArea');
+  if (kitName) kitName.innerHTML = kitData.name;
+  if (kitBrand) kitBrand.textContent = kitData.brand;
+  if (kitBrandBox) kitBrandBox.textContent = kitData.boxBrand;
+  if (kitBoxTitle) kitBoxTitle.innerHTML = kitData.boxTitle.replace(/\n/g, '<br>');
+  if (kitBoxRight) kitBoxRight.style.background = kitData.boxRight;
+  if (kitBgArea) kitBgArea.style.background = skinHeroGrad[skin];
+
+  // Update scan line color
+  const scanLine = document.querySelector('.scan-line');
+  if (scanLine) {
+    const c = getComputedStyle(document.body).getPropertyValue('--color-primary').trim();
+    scanLine.style.background = `linear-gradient(90deg, transparent, ${c} 30%, ${c} 70%, transparent)`;
+    scanLine.style.boxShadow = `0 0 8px ${c}`;
+  }
+}
+
+// Set date
+const dateEl = document.getElementById('dash-date-label');
+if (dateEl) {
+  dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Init default skin visuals on load
+// ── Nav Slider ──
+const SCREEN_MAP = [
+  { id:'s-welcome',        label:'Welcome',       section:'Auth'         },
+  { id:'s-login',          label:'Sign In',        section:'Auth'         },
+  { id:'s-signup',         label:'Sign Up',        section:'Auth'         },
+  { id:'s-otp-email',      label:'Verify Email',   section:'Auth'         },
+  { id:'s-create-pw',      label:'Create PW',      section:'Auth'         },
+  { id:'s-otp-phone',      label:'Verify Phone',   section:'Auth'         },
+  { id:'s-profile',        label:'Profile',        section:'Auth'         },
+  { id:'s-done',           label:'Done',           section:'Auth'         },
+  { id:'s-dashboard',      label:'Dashboard',      section:'Home'         },
+  { id:'s-history',        label:'History',        section:'Home'         },
+  { id:'s-account',        label:'Account',        section:'Home'         },
+  { id:'s-info',           label:'Info',           section:'Home'         },
+  { id:'s-scan-intro',     label:'Scan Intro',     section:'Kit Setup'    },
+  { id:'s-scanner',        label:'Scanner',        section:'Kit Setup'    },
+  { id:'s-kit-contents',   label:'Kit Contents',   section:'Kit Setup'    },
+  { id:'s-instructions',   label:'Instructions',   section:'Start'        },
+  { id:'s-capture-intro',  label:'Capture Intro',  section:'Capture'      },
+  { id:'s-capture-camera', label:'Camera',         section:'Capture'      },
+  { id:'s-capture-review', label:'Review',         section:'Capture'      },
+  { id:'s-processing',     label:'Processing',     section:'Capture'      },
+  { id:'s-result-control', label:'Control Line',   section:'Results'      },
+  { id:'s-result-covid',   label:'COVID-19',       section:'Results'      },
+  { id:'s-result-flua',    label:'FLU-A',          section:'Results'      },
+  { id:'s-result-flub',    label:'FLU-B',          section:'Results'      },
+  { id:'s-result-confirm', label:'Confirm',        section:'Results'      },
+  { id:'s-test-record',    label:'Test Record',    section:'Results'      },
+  { id:'s-support',        label:'Support',        section:'Support'      },
+  { id:'s-forgot',         label:'Forgot PW',      section:'Support'      },
+];
+
+function initSlider() {
+  const slider = document.getElementById('navSlider');
+  const total = SCREEN_MAP.length - 1;
+  slider.max = total;
+
+  // Build section boundary labels above the track
+  const above = document.getElementById('sliderSectionsAbove');
+  const sections = [];
+  SCREEN_MAP.forEach((s, i) => {
+    const prev = SCREEN_MAP[i - 1];
+    if (!prev || prev.section !== s.section) sections.push({ label: s.section, idx: i });
+  });
+
+  // Filter out sections too close together (min 11% gap)
+  const filtered = [];
+  let lastPct = -99;
+  sections.forEach(sec => {
+    const pct = (sec.idx / total) * 100;
+    if (pct - lastPct >= 11 || sec.idx === 0) {
+      filtered.push({ ...sec, pct });
+      lastPct = pct;
+    }
+  });
+
+  filtered.forEach(sec => {
+    const span = document.createElement('span');
+    span.textContent = sec.label;
+    span.style.left = sec.pct.toFixed(1) + '%';
+    above.appendChild(span);
+  });
+
+  updateSliderUI(0);
+}
+
+function updateSliderUI(idx) {
+  const total = SCREEN_MAP.length - 1;
+  const pct = ((idx / total) * 100).toFixed(1);
+  const slider = document.getElementById('navSlider');
+  slider.style.setProperty('--fill', pct + '%');
+  const entry = SCREEN_MAP[idx];
+  document.getElementById('sliderScreenBelow').textContent =
+    entry.section + '  ·  ' + entry.label;
+}
+
+function onSliderInput(val) {
+  const idx = parseInt(val);
+  updateSliderUI(idx);
+  go(SCREEN_MAP[idx].id);
+}
+
+function syncSlider(screenId) {
+  const idx = SCREEN_MAP.findIndex(s => s.id === screenId);
+  if (idx >= 0) {
+    document.getElementById('navSlider').value = idx;
+    updateSliderUI(idx);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => { setSkin('default'); initSlider(); });
+
+
+// Navigation
+let current = 's-welcome';
+function go(id) {
+  const cur = document.getElementById(current);
+  const nxt = document.getElementById(id);
+  if (!nxt || cur === nxt) return;
+  cur.classList.add('exit'); cur.classList.remove('active');
+  nxt.classList.add('active'); nxt.classList.remove('exit');
+  setTimeout(() => cur.classList.remove('exit'), 340);
+  current = id;
+  if (typeof syncSlider === 'function') syncSlider(id);
+}
+
+// OTP
+[['otp-e','btn-e'],['otp-p','btn-p']].forEach(([rowId, btnId]) => {
+  const row = document.getElementById(rowId);
+  const btn = document.getElementById(btnId);
+  const boxes = [...row.querySelectorAll('.otp-box')];
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.classList.toggle('filled', !!box.value);
+      if (box.value && i < 5) boxes[i+1].focus();
+      if (btn) btn.style.display = boxes.every(b=>b.value) ? 'block' : 'none';
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        boxes[i-1].value = ''; boxes[i-1].classList.remove('filled'); boxes[i-1].focus();
+      }
+    });
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const t = e.clipboardData.getData('text').replace(/\D/g,'').slice(0,6);
+      boxes.forEach((b,j) => { b.value=t[j]||''; b.classList.toggle('filled',!!b.value); });
+      if (btn) btn.style.display = boxes.every(b=>b.value)?'block':'none';
+    });
+  });
+});
+
+function togglePW(id, icon) {
+  const el = document.getElementById(id);
+  el.type = el.type==='password' ? 'text' : 'password';
+  icon.style.opacity = el.type==='text' ? '1' : '.5';
+}
+function checkPW(inp) {
+  const v = inp.value;
+  const t = (id,test) => document.getElementById(id).classList.toggle('met',test);
+  t('req-len', v.length>=8); t('req-upper', /[A-Z]/.test(v));
+  t('req-lower', /[a-z]/.test(v)); t('req-num', /[0-9]/.test(v));
+  t('req-special', /[^A-Za-z0-9]/.test(v));
+}
+function resendCode(id) {
+  const el = document.getElementById(id); let t = 30;
+  el.textContent = `(${t}s)`;
+  const iv = setInterval(() => { el.textContent = --t>0?`(${t}s)`:''; if(!t)clearInterval(iv); }, 1000);
+}
+// ── Tab navigation ──
+const TAB_SCREENS = ['s-dashboard','s-history','s-info','s-account'];
+function setTab(id) {
+  // Navigate to tab screen
+  go(id);
+  // Update active state on all tab bars
+  document.querySelectorAll('.tab-item').forEach(btn => {
+    const targetId = (btn.getAttribute('onclick') || '').match(/setTab\('([^']+)'\)/)?.[1];
+    btn.classList.toggle('active', targetId === id);
+  });
+}
+
+// ── Test history ──
+const testHistory = [];
+function addToHistory(results, kitName, indication, dateStr) {
+  testHistory.unshift({ results, kitName, indication, dateStr });
+  renderHistory();
+}
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  const empty = document.getElementById('history-empty');
+  if (!list || !empty) return;
+  if (testHistory.length === 0) {
+    empty.style.display = 'flex'; list.style.display = 'none'; return;
+  }
+  empty.style.display = 'none'; list.style.display = 'flex';
+  list.innerHTML = testHistory.map((rec, i) => {
+    const badges = Object.entries(rec.results)
+      .map(([k, v]) => {
+        const label = k === 'covid' ? 'COVID-19' : k === 'flua' ? 'FLU-A' : 'FLU-B';
+        const cls = v === 'Positive' ? 'positive' : 'negative';
+        return `<span class="history-badge ${cls}">${label}: ${v}</span>`;
+      }).join('');
+    return `<div class="history-card" onclick="viewHistoryRecord(${i})">
+      <div class="history-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="history-card-body">
+        <div class="history-card-name">${rec.kitName}</div>
+        <div class="history-card-date">Diagnostic Co &nbsp;·&nbsp; ${rec.dateStr}</div>
+        <div class="history-card-badges">${badges}</div>
+      </div>
+      <div class="history-card-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>`;
+  }).join('');
+}
+function viewHistoryRecord(i) {
+  const rec = testHistory[i];
+  if (!rec) return;
+  // Repopulate test record screen and navigate to it
+  Object.entries(rec.results).forEach(([k, v]) => {
+    const el = document.getElementById('rec-' + k);
+    if (el) { el.textContent = v; el.className = 'record-result-value ' + (v === 'Positive' ? 'positive' : 'negative'); }
+  });
+  const indEl = document.getElementById('record-indication');
+  if (indEl) indEl.textContent = rec.indication;
+  const dateEl = document.getElementById('record-date');
+  if (dateEl) dateEl.textContent = rec.dateStr;
+  const kn = document.getElementById('record-kit-name');
+  if (kn) kn.textContent = rec.kitName;
+  go('s-test-record');
+}
+
+// ── Account helpers ──
+function showSave() {
+  document.getElementById('acct-save-btn').classList.add('visible');
+}
+function saveAccount() {
+  document.getElementById('acct-save-btn').classList.remove('visible');
+}
+
+// ── Results flow ──
+const testResults = { covid: null, flua: null, flub: null };
+
+function selectRadio(groupId, el, val) {
+  document.querySelectorAll('#' + groupId + ' .radio-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function setResult(key, val) {
+  testResults[key] = val;
+}
+function enableBtn(id) {
+  const btn = document.getElementById(id);
+  if (btn) { btn.classList.remove('disabled'); }
+}
+function toggleAttest() {
+  const row = document.getElementById('attest-row');
+  row.classList.toggle('checked');
+  const checked = row.classList.contains('checked');
+  const btn = document.getElementById('btn-confirm');
+  btn.classList.toggle('disabled', !checked);
+  // sync confirm display values
+  updateConfirmDisplay();
+}
+function updateConfirmDisplay() {
+  ['covid','flua','flub'].forEach(k => {
+    const val = testResults[k] || '—';
+    const el = document.getElementById('conf-' + k);
+    if (el) {
+      el.textContent = val;
+      el.className = 'confirm-result-value' + (val === 'Positive' ? ' positive' : val === 'Negative' ? ' negative' : '');
+    }
+  });
+}
+// Override go() to populate confirm/record when navigating to those screens
+const _go = go;
+go = function(id) {
+  if (id === 's-result-confirm') updateConfirmDisplay();
+  if (id === 's-test-record') populateRecord();
+  _go(id);
+};
+function populateRecord() {
+  // Results
+  ['covid','flua','flub'].forEach(k => {
+    const val = testResults[k] || '—';
+    const el = document.getElementById('rec-' + k);
+    if (el) {
+      el.textContent = val;
+      el.className = 'record-result-value' + (val === 'Positive' ? ' positive' : val === 'Negative' ? ' negative' : '');
+    }
+  });
+  // Indication
+  const pos = Object.entries(testResults).filter(([,v]) => v === 'Positive').map(([k]) => k.toUpperCase().replace('COVID','COVID-19').replace('FLUA','FLU-A').replace('FLUB','FLU-B'));
+  const indEl = document.getElementById('record-indication');
+  if (indEl) indEl.textContent = pos.length ? 'Positive for ' + pos.join(' & ') : 'No Positive Results Detected';
+  // Date
+  const dateEl = document.getElementById('record-date');
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  // Kit name from skin
+  const skin = document.body.getAttribute('data-skin');
+  const kits = { bd:'BD Veritor™ COVID-19 + Flu A&B (2 Test/Box)', quidel:'QuickVue® COVID-19 + Flu A&B (2 Test/Box)', abbott:'BinaxNOW™ COVID-19 Ag Self Test (2 Test/Box)', ihealth:'iHealth COVID-19 + Flu A&B 3-in-1 (2 Test/Box)', default:'COVID-19 / Flu A&B Self-Test (2 Test/Box)' };
+  const kn2 = document.getElementById('record-kit-name');
+  if (kn2) kn2.textContent = kits[skin] || kits.default;
+  // Add to test history
+  const dateStr2 = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const posKeys = Object.entries(testResults).filter(([,v]) => v === 'Positive').map(([k]) => k === 'covid' ? 'COVID-19' : k === 'flua' ? 'FLU-A' : 'FLU-B');
+  const ind = posKeys.length ? 'Positive for ' + posKeys.join(' & ') : 'No Positive Results Detected';
+  addToHistory({...testResults}, (kits[skin] || kits.default), ind, dateStr2);
+}
+function startProcessing() {
+  // Update processing screen bg to current skin's primary color
+  const primary = getComputedStyle(document.body).getPropertyValue('--color-primary').trim();
+  const ps = document.getElementById('s-processing');
+  ps.style.background = primary;
+  go('s-processing');
+  setTimeout(() => go('s-result-control'), 1200);
+}
+function checkSupportReady() {
+  const purpose = document.getElementById('supportPurpose').value;
+  const msg = document.getElementById('supportMessage').value.trim();
+  const btn = document.getElementById('supportSendBtn');
+  const ready = purpose && msg.length > 0;
+  btn.style.opacity = ready ? '1' : '.45';
+  btn.style.pointerEvents = ready ? 'auto' : 'none';
+}
+function submitSupport() {
+  document.getElementById('supportForm').style.display = 'none';
+  document.getElementById('supportSent').classList.add('visible');
+}
+function resetSupport() {
+  document.getElementById('supportPurpose').value = '';
+  document.getElementById('supportMessage').value = '';
+  document.getElementById('supportForm').style.display = 'block';
+  document.getElementById('supportSent').classList.remove('visible');
+  checkSupportReady();
+}
+function closeModal() { document.getElementById('errorModal').classList.remove('open'); }
+</script>
+</div><!-- /page-wrap -->
+</body>
+</html>
