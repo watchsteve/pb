@@ -3917,5 +3917,14 @@ function resetSupport() {
 function closeModal() { document.getElementById('errorModal').classList.remove('open'); }
 </script>
 </div><!-- /page-wrap -->
+
+<script>
+  function sendHeight() {
+    window.parent.postMessage(document.body.scrollHeight, '*');
+  }
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+</script>
+
 </body>
 </html>
