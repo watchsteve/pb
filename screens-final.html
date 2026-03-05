@@ -12,17 +12,19 @@
    RESET
 ══════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
+html {
   height: 100%;
-  width: 100%;
-  -webkit-font-smoothing: antialiased;
-  font-family: var(--font-body, system-ui);
-  background: #e5e5e5;
+  overflow: hidden;
 }
 body {
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
+  -webkit-font-smoothing: antialiased;
+  font-family: var(--font-body, system-ui);
+  background: #e5e5e5;
 }
 
 /* ══════════════════════════════════════════════════
@@ -135,7 +137,8 @@ body {
   flex-direction: column;
   width: 100%;
   max-width: 390px;
-  min-height: 100svh;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* ══════════════════════════════════════════════════
@@ -3917,14 +3920,5 @@ function resetSupport() {
 function closeModal() { document.getElementById('errorModal').classList.remove('open'); }
 </script>
 </div><!-- /page-wrap -->
-
-<script>
-  function sendHeight() {
-    window.parent.postMessage(document.body.scrollHeight, '*');
-  }
-  window.addEventListener('load', sendHeight);
-  window.addEventListener('resize', sendHeight);
-</script>
-
 </body>
 </html>
